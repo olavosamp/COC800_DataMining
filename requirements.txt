@@ -6,3 +6,4 @@ pandas
 sklearn
 seaborn
 vispy
+tensorflow

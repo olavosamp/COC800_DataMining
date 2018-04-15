@@ -1,5 +1,5 @@
 import numpy                as np
-import seaborn              as sns
+# import seaborn              as sns
 import matplotlib.pyplot    as plt
 # import sklearn              as skl
 from sklearn.decomposition  import PCA
@@ -25,7 +25,6 @@ x_mean = np.mean(x) # Mean over every flattened input
 x_std  = np.std(x)  # Std over every flattened input
 
 x = np.divide(x - x_mean, x_std)
-
 
 ## PCA
 Data_pca = PCA(n_components=None)
