@@ -1,11 +1,7 @@
 import numpy as np
 import pandas as pd
 
-from load_dataset import load_dataset
-
-def preproc(verbose=False):
-    dataDf = load_dataset(fracPos=0.2, fracNeg=0.02)
-
+def preproc(dataDf, verbose=False):
     ## Display basic dataset information, clean up and preprocess the data
 
     if verbose:
@@ -18,23 +14,24 @@ def preproc(verbose=False):
 
     # Features containing only zeros will be dropped
     dataDf = dataDf.loc[:, (dataDf != 0).any(axis=0)]
+    print("\n{} features containing only zeros have been dropped from data.".format(allZeros))
+
     if verbose:
-        print("\n{} features containing only zeros have been dropped from data.".format(allZeros))
         print("\nNew data shape: ", dataDf.shape)
 
     # Z-score normalization
     mean = dataDf.iloc[:, :-1].mean(axis=0)
     std  = dataDf.iloc[:, :-1].std (axis=0)
-
     dataDf.iloc[:, :-1] = (dataDf.iloc[:, :-1] - mean)/std
 
-    # print("\nNew data shape: ", dataDf.shape)
-
+    ## "Basic Sample Statistics"
     if verbose:
-        print("\nMax:\n", dataDf.iloc[:, :-1].max (axis=0))
-        print("\nMin:\n", dataDf.iloc[:, :-1].min (axis=0))
-        print("\nMean:\n",dataDf.iloc[:, :-1].mean(axis=0))
-        print("\nStd:\n", dataDf.iloc[:, :-1].std (axis=0))
+        print("\nMax:\n", dataDf.iloc[:, :-1].max   (axis=0))
+        print("\nMin:\n", dataDf.iloc[:, :-1].min   (axis=0))
+        print("\nMean:\n",dataDf.iloc[:, :-1].mean  (axis=0))
+        print("\nMed:\n", dataDf.iloc[:, :-1].median(axis=0))
+        print("\nVar:\n", dataDf.iloc[:, :-1].std   (axis=0))
+        print("\nStd:\n", dataDf.iloc[:, :-1].var   (axis=0))
 
     return dataDf
 

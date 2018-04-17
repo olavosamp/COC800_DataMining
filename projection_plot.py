@@ -4,25 +4,29 @@ import matplotlib.pyplot    as plt
 
 # from mpl_toolkits.mplot3d   import Axes3D
 
-def projection_plot(dataDf):
-    # features = dataDf.shape[1]-1
-    features = 10
+def projection_plot(inputDf, labelDf):
+    '''
+    inputDf is an observations by features DataFrame
+    labelDf is an observations by 1 DataFrame of [+1, -1] labels
+    '''
+    features = inputDf.shape[1]
+    # features = 10
 
-    posData = dataDf.loc[dataDf.iloc[:, -1] == +1]  # Last DataFrame columns are labels:
-    negData = dataDf.loc[dataDf.iloc[:, -1] == -1]  # used to filter data by class
+    posData = inputDf.loc[labelDf == +1]  # Last DataFrame columns are labels:
+    negData = inputDf.loc[labelDf == -1]  # used to filter data by class
 
-    fig, axs = plt.subplots(nrows=features, ncols=features, squeeze=False)#, tight_layout=True)
+    fig, axs = plt.subplots(nrows=features, ncols=features, figsize=(12,10))#, squeeze=False, tight_layout=True)
 
+    # print("\nMax: ", features)
     for row in range(features):
         for col in range(features):
             if row == col:
                 # Plot histogram of feature i
-                axs[row,col].hist(dataDf.iloc[:, col].values)  # axis.hist() method doesn't work with DataFrame
-                pass
+                axs[row,col].hist(inputDf.iloc[:, col].values, bins='auto', color='xkcd:dull blue')  # axis.hist() method doesn't work with DataFrame
             else:
                 # Plot projection X_i by X_j
-                axs[row,col].plot(negData.iloc[:, row], negData.iloc[:, col], 'b.')
-                axs[row,col].plot(posData.iloc[:, row], posData.iloc[:, col], 'r.')
+                axs[row,col].plot(negData.iloc[:, row], negData.iloc[:, col], '.', alpha=0.3, markerfacecolor='xkcd:dull blue')
+                axs[row,col].plot(posData.iloc[:, row], posData.iloc[:, col], '.', alpha=0.3, markerfacecolor='xkcd:reddish pink', markeredgecolor='xkcd:tomato')
 
             # Hide axis labels
             axs[row,col].get_xaxis().set_visible(False)
