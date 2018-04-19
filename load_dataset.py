@@ -1,11 +1,9 @@
 import numpy                as np
 import pandas               as pd
 
-import dirs
-
-def load_dataset(fracPos=1.0, fracNeg=1.0):
+def load_dataset(path, fracPos=1.0, fracNeg=1.0):
     # Load raw data
-    data = np.load(dirs.dataset)
+    data = np.load(path)
 
     # Save each class
     # classPos = pd.DataFrame(data[data.keys()[0]])
