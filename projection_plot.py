@@ -4,16 +4,16 @@ import matplotlib.pyplot    as plt
 
 # from mpl_toolkits.mplot3d   import Axes3D
 
-def projection_plot(inputDf, labelDf):
+def projection_plot(inputDf, labels):
     '''
     inputDf is an observations by features DataFrame
-    labelDf is an observations by 1 DataFrame of [+1, -1] labels
+    labels is an observations by 1 DataFrame of [+1, -1] labels
     '''
     features = inputDf.shape[1]
     # features = 10
 
-    posData = inputDf.loc[labelDf == +1]  # Last DataFrame columns are labels:
-    negData = inputDf.loc[labelDf == -1]  # used to filter data by class
+    posData = inputDf[labels == +1]  # Last DataFrame columns are labels:
+    negData = inputDf[labels == -1]  # used to filter data by class
 
     fig, axs = plt.subplots(nrows=features, ncols=features, figsize=(12,10))#, squeeze=False, tight_layout=True)
 

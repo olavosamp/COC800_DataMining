@@ -6,25 +6,26 @@ def load_dataset(path, fracPos=1.0, fracNeg=1.0):
     data = np.load(path)
 
     # Save each class
-    # classPos = pd.DataFrame(data[data.keys()[0]])
-    # classNeg = pd.DataFrame(data[data.keys()[1]])
-    classPos = data[data.keys()[0]]
-    classNeg = data[data.keys()[1]]
+    # classPos = data[data.keys()[0]]
+    # classNeg = data[data.keys()[1]]
+    classPos = pd.DataFrame(data[data.keys()[0]])
+    classNeg = pd.DataFrame(data[data.keys()[1]])
 
     # Sample a fraction of the data
     # doing this before anything else avoids memory issues
+    features = classPos.shape[1]
     totPos = classPos.shape[0]
     totNeg = classNeg.shape[0]
 
     # choose random indexes
-    indexPos = np.random.choice(range(totPos), size=int(totPos*fracPos), replace=False)
-    indexNeg = np.random.choice(range(totNeg), size=int(totNeg*fracNeg), replace=False)
+    # indexPos = np.random.choice(range(totPos), size=int(totPos*fracPos), replace=False)
+    # indexNeg = np.random.choice(range(totNeg), size=int(totNeg*fracNeg), replace=False)
+    #
+    # classPos = classPos[indexPos,:]
+    # classNeg = classNeg[indexNeg,:]
 
-    classPos = classPos[indexPos,:]
-    classNeg = classNeg[indexNeg,:]
-
-    # classPos = classPos.sample(frac=fracPos, axis=0)
-    # classNeg = classNeg.sample(frac=fracNeg, axis=0)
+    classPos = classPos.sample(frac=fracPos, axis=0)
+    classNeg = classNeg.sample(frac=fracNeg, axis=0)
 
     entriesPos = classPos.shape[0]
     entriesNeg = classNeg.shape[0]
@@ -35,9 +36,9 @@ def load_dataset(path, fracPos=1.0, fracNeg=1.0):
     yNeg  = -np.ones((entriesNeg,1))  # can lead to faster gradient convergence
 
     # Concatenate input data and labels
-
-    classPos = pd.DataFrame(np.concatenate((classPos, yPos), axis=1))
-    classNeg = pd.DataFrame(np.concatenate((classNeg, yNeg), axis=1))
+    labels = np.concatenate((yPos, yNeg))
+    # classPos = pd.DataFrame(np.concatenate((classPos, yPos), axis=1))
+    # classNeg = pd.DataFrame(np.concatenate((classNeg, yNeg), axis=1))
 
     print("\nData loaded with following class distribution: ")
     print("Positive class: {:.2f} %, {} entries ".format(entriesPos/total*100, entriesPos))
@@ -45,7 +46,8 @@ def load_dataset(path, fracPos=1.0, fracNeg=1.0):
 
     # Save dataset in a DataFrame
     dataDf = pd.DataFrame(np.concatenate((classPos, classNeg)))
-    return dataDf
+    dataDf.rename({-1:"labels"}, axis='columns')
+    return dataDf, labels
 
 if __name__ == "__main__":
     load_dataset()
