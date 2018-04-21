@@ -20,13 +20,14 @@ def projection_plot(inputDf, labels):
     # print("\nMax: ", features)
     for row in range(features):
         for col in range(features):
-            if row == col:
-                # Plot histogram of feature i
-                axs[row,col].hist(inputDf.iloc[:, col].values, bins='auto', color='xkcd:dull blue')  # axis.hist() method doesn't work with DataFrame
-            else:
-                # Plot projection X_i by X_j
-                axs[row,col].plot(negData.iloc[:, row], negData.iloc[:, col], '.', alpha=0.3, markerfacecolor='xkcd:dull blue')
-                axs[row,col].plot(posData.iloc[:, row], posData.iloc[:, col], '.', alpha=0.3, markerfacecolor='xkcd:reddish pink', markeredgecolor='xkcd:tomato')
+            if row <= col:
+                if row == col:
+                    # Plot histogram of feature i
+                    axs[row,col].hist(inputDf.iloc[:, col].values, bins='auto', color='xkcd:dull blue')  # axis.hist() method doesn't work with DataFrame
+                else:
+                    # Plot projection X_i by X_j
+                    axs[row,col].plot(posData.iloc[:, row], posData.iloc[:, col], '.', alpha=0.3, markerfacecolor='xkcd:fire engine red', markeredgecolor='xkcd:tomato')
+                    axs[row,col].plot(negData.iloc[:, row], negData.iloc[:, col], '.', alpha=0.3, markerfacecolor='xkcd:night blue', markeredgecolor='xkcd:dark blue')
 
             # Hide axis labels
             axs[row,col].get_xaxis().set_visible(False)

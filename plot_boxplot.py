@@ -14,7 +14,8 @@ def plot_boxplot(inputDf, labels):
     ax.set_title("Boxplot of {} features".format(inputDf.shape[1]))
     plt.show()
 
-    ax = sns.swarmplot(data=inputDf)
-    ax.set_title("Swarmplot of {} features".format(inputDf.shape[1]))
+    # Unusable, scales very badly with large number of observations
+    # ax = sns.swarmplot(data=inputDf)
+    # ax.set_title("Swarmplot of {} features".format(inputDf.shape[1]))
     plt.show()
     return ax

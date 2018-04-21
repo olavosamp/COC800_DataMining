@@ -3,11 +3,14 @@ import pandas               as pd
 
 from sklearn.decomposition  import PCA
 
-def dimension_reduction(dataDf, keepComp=10):
+def dimension_reduction(dataDf, keepComp=0):
     '''
     dataDf:   is an observations by features DataFrame
     keepComp: Number of components to keep
     '''
+    if keepComp <= 0:
+        keepComp = dataDf.shape[1]
+
     dataPCA = PCA(n_components=None)
 
     xCompact = dataPCA.fit_transform(dataDf)
