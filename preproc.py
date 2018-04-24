@@ -19,6 +19,7 @@ def preproc(dataDf, verbose=False):
     if verbose:
         print("\nNew data shape: ", dataDf.shape)
 
+
     # Z-score normalization
     mean = dataDf.mean(axis=0)
     std  = dataDf.std (axis=0)
@@ -26,12 +27,12 @@ def preproc(dataDf, verbose=False):
 
     ## "Basic Sample Statistics"
     if verbose:
-        print("\nMax:\n", dataDf.max   (axis=0))
-        print("\nMin:\n", dataDf.min   (axis=0))
-        print("\nMean:\n",dataDf.mean  (axis=0))
-        print("\nMed:\n", dataDf.median(axis=0))
-        print("\nVar:\n", dataDf.std   (axis=0))
-        print("\nStd:\n", dataDf.var   (axis=0))
+        print("\nMax:\n", dataDf.max   (axis=0).max())
+        print("\nMin:\n", dataDf.min   (axis=0).min())
+        print("\nMean:\n",dataDf.mean  (axis=0).mean())
+        print("\nMed:\n", dataDf.median(axis=0).mean())
+        print("\nVar:\n", dataDf.std   (axis=0).mean())
+        print("\nStd:\n", dataDf.var   (axis=0).mean())
 
     return dataDf
 

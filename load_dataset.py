@@ -43,6 +43,7 @@ def load_dataset(path, fracPos=1.0, fracNeg=1.0):
     print("\nData loaded with following class distribution: ")
     print("Positive class: {:.2f} %, {} entries ".format(entriesPos/total*100, entriesPos))
     print("Negative class: {:.2f} %, {} entries ".format(entriesNeg/total*100, entriesNeg))
+    print("Total:          {} entries".format(total))
 
     # Save dataset in a DataFrame
     dataDf = pd.DataFrame(np.concatenate((classPos, classNeg)))
