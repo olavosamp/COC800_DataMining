@@ -13,7 +13,7 @@ def corr_matrix_plot(inputDf):
 
     # Draw the heatmap with the mask and correct aspect ratio
     sns.heatmap(corr, cmap='viridis', vmax=.3, center=0,
-                square=True, linewidths=0.01, cbar_kws={"shrink": .5})
+                square=True, linewidths=0.00, cbar_kws={"shrink": .5})
 
     ax.set_title("Correlation plot of {} features".format(len(corr)))
     ax.get_xaxis().set_visible(False)
