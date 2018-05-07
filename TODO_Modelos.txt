@@ -1,0 +1,20 @@
+Modelos a implementar:
+
+Classificador Linear Generalizado     (Se servir para classificação)
+Classificador Quadrático Generalizado (idem)
+
+Naive Bayes (Estimador MAP)
+
+Discriminador Linear      (LDA)
+Discriminador Quadrático  (QDA)
+
+Rede neural MLP
+
+Árvore de Classificação
+Random Forest
+Ada/Gradient Boost ou similares
+
+SVM Linear
+SVM Outros kernels
+
+Mistura Gaussiana

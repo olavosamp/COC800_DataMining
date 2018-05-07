@@ -24,7 +24,6 @@ def preproc(dataDf, verbose=False):
     mean = dataDf.mean(axis=0)
     std  = dataDf.std (axis=0)
     dataDf = (dataDf - mean)/std
-
     ## "Basic Sample Statistics"
     if verbose:
         print("\nMax:\n", dataDf.max   (axis=0).max())
@@ -33,6 +32,7 @@ def preproc(dataDf, verbose=False):
         print("\nMed:\n", dataDf.median(axis=0).mean())
         print("\nVar:\n", dataDf.std   (axis=0).mean())
         print("\nStd:\n", dataDf.var   (axis=0).mean())
+
 
     return dataDf
 
