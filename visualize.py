@@ -12,7 +12,7 @@ from vis_functions          import (eigen_plot,
                                     plot_boxplot)
 randomState = 17
 
-dataDf, labels, testDf, testLabels = load_dataset(dirs.dataset, fracPos=0.02, fracNeg=0.02, randomState=randomState)
+dataDf, labels = load_dataset(dirs.dataset, fracPos=0.02, fracNeg=0.02, randomState=randomState)
 dataDf = preproc(dataDf, verbose=True)
 
 ## Principal Components Analysis

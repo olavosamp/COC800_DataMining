@@ -8,8 +8,8 @@ def gaussian_naive_bayes(dataDf, labels, testDf, testLabels):
     gnb = GaussianNB()
     gnb.fit(dataDf, labels)
 
-    print(dataDf.shape)
-    print(testDf.shape)
+    # print(dataDf.shape)
+    # print(testDf.shape)
 
 
     predictions = gnb.predict(testDf)
