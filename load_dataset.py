@@ -1,6 +1,8 @@
 import numpy                as np
 import pandas               as pd
 
+import defines
+
 def load_dataset(path, fracPos=1.0, fracNeg=1.0, numPos=0, numNeg=0, randomState=None):
     # Load raw data
     data = np.load(path)
@@ -11,7 +13,7 @@ def load_dataset(path, fracPos=1.0, fracNeg=1.0, numPos=0, numNeg=0, randomState
 
     # Sample a fraction of the data
     # doing this before anything else avoids memory issues
-    features = classPos.shape[1]
+    # features = classPos.shape[1]
     totPos   = classPos.shape[0]
     totNeg   = classNeg.shape[0]
 
@@ -21,7 +23,6 @@ def load_dataset(path, fracPos=1.0, fracNeg=1.0, numPos=0, numNeg=0, randomState
     else:
         classPos = classPos.sample(n=numPos, axis=0)
         classNeg = classNeg.sample(n=numNeg, axis=0)
-
 
     # if testSize > 0:
     #     # Create test set with testSize elements per class
@@ -46,15 +47,15 @@ def load_dataset(path, fracPos=1.0, fracNeg=1.0, numPos=0, numNeg=0, randomState
     total = entriesPos + entriesNeg
 
     # Create Label vectors
-    yPos  =  np.ones(entriesPos)  # [+1, -1] representation has zero mean, which
-    yNeg  = -np.ones(entriesNeg)  # can lead to faster gradient convergence
+    yPos  = np.ones(entriesPos, dtype=int)*defines.posCode  # [+1, -1] representation has zero mean, which
+    yNeg  = np.ones(entriesNeg, dtype=int)*defines.negCode  # can lead to faster gradient convergence
 
-    # Concatenate input data and labels
+    # Concatenate class labels
     labels = np.concatenate((yPos, yNeg))
 
-    print("\nData loaded with following class distribution: ")
-    print("Positive class: {:.2f} %, {} entries ".format(entriesPos/total*100, entriesPos))
-    print("Negative class: {:.2f} %, {} entries ".format(entriesNeg/total*100, entriesNeg))
+    print("\n\nData loaded with following class distribution: ")
+    print("Positive class: {:3.2f} %, {} entries ".format(entriesPos/total*100, entriesPos))
+    print("Negative class: {:3.2f} %, {} entries ".format(entriesNeg/total*100, entriesNeg))
     print("Total:          {} entries".format(total))
 
     # Save dataset in a DataFrame

@@ -1,9 +1,16 @@
 Modelos a implementar:
 
-Classificador Linear Generalizado     (Se servir para classificação)
-Classificador Quadrático Generalizado (idem)
+Classificadores Lineares Generalizados
+  Mínimos Quadrados / Least Squares OK
+    | com Regularização
+  Regressão Logística
+    | com Regularização
+  Regressão Polinomial (cria novas features a partir de combinações lineares das originais)
+  Perceptron ?
 
-Naive Bayes (Estimador MAP)
+Naive Bayes OK
+
+(K-)Nearest Neighbours (usar ball tree)
 
 Discriminador Linear      (LDA)
 Discriminador Quadrático  (QDA)
@@ -11,10 +18,12 @@ Discriminador Quadrático  (QDA)
 Rede neural MLP
 
 Árvore de Classificação
-Random Forest
-Ada/Gradient Boost ou similares
+Ensembles
+  Bagging (Pasting algorithm)
+  Random Forest
+  Ada/Gradient Boost ou similares
 
 SVM Linear
 SVM Outros kernels
 
-Mistura Gaussiana
+Mistura Gaussiana (Não supervisionado)
