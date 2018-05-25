@@ -10,10 +10,11 @@ from sklearn.model_selection import train_test_split
 from bayes                  import gaussian_naive_bayes
 from show_class_splits      import show_class_splits
 from least_squares          import least_squares, ridge_least_squares
+from logistic_regression    import log_reg
 
 testSize = 5000
 
-dataDf, labels = load_dataset(dirs.dataset, randomState=None, numPos=10000, numNeg=10000)#fracPos=0.02, fracNeg=0.02)
+dataDf, labels = load_dataset(dirs.dataset, randomState=10, numPos=12500, numNeg=12500)#fracPos=0.02, fracNeg=0.02)
 dataDf = preproc(dataDf, verbose=False)
 # labeledDf = dataDf.assign(Labels=labels)
 
@@ -33,21 +34,27 @@ bayesPred = gaussian_naive_bayes(trainDf, y_train, testDf, y_test)
 print("\nNaive Bayes")
 print("Correct predictions ", np.sum(bayesPred == y_test)/testSize)
 
-## Classificadores Lineares Generalizados
-'Least Squares'
-lqPred = least_squares(trainDf, y_train, testDf, y_test)
-print("\nLeast Squares")
-print("Correct predictions ", np.sum(lqPred == y_test)/testSize)
-
-#| com Regularização
-'Least Squares with L2/Ridge Regularization'
-rlqPred = ridge_least_squares(trainDf, y_train, testDf, y_test, regVal=10000)
-print("\nRidge Least Squares")
-print("Correct predictions ", np.sum(rlqPred == y_test)/testSize)
-
-print("\nIs regression making a difference?\n", np.sum(lqPred == rlqPred)/testSize)
+# ## Classificadores Lineares Generalizados
+# 'Least Squares'
+# lqPred = least_squares(trainDf, y_train, testDf, y_test)
+# print("\nLeast Squares")
+# print("Correct predictions ", np.sum(lqPred == y_test)/testSize)
+#
+# #| com Regularização
+# 'Least Squares with L2/Ridge Regularization'
+# rlqPred = ridge_least_squares(trainDf, y_train, testDf, y_test, regVal=5.0)
+# print("\nRidge Least Squares")
+# print("Correct predictions ", np.sum(rlqPred == y_test)/testSize)
+#
+# print("\nIs regression making a difference?\nPrediction vectors are {}/1.0 similar".format(np.sum(lqPred == rlqPred)/testSize))
 
 #   Regressão Logística | com Regularização
+'Logistic Regression'
+logPred = log_reg(trainDf, y_train, testDf, y_test)
+print("\nLogistic Regression")
+print("Correct predictions ", np.sum(logPred == y_test)/testSize)
+
+
 #   Regrassão Polinomial (criação de novas features)
 #   Perceptron ?
 
