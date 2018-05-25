@@ -5,7 +5,7 @@ from sklearn.linear_model   import LogisticRegression
 import dirs
 import defines              as defs
 
-def log_reg(x_train, y_train, x_test, y_test, thres=0.5):
+def log_reg(x_train, y_train, x_test, y_test):
     '''
         Train Logistic Regression classifier on x_train and predict on x_test.
 
@@ -19,11 +19,21 @@ def log_reg(x_train, y_train, x_test, y_test, thres=0.5):
 
     predictions = logReg.predict(x_test)
 
-    # # Normalize predictions to [0, 1] range
-    # scaler = MinMaxScaler(copy=False, feature_range=(0, 1))
-    # scaler.fit_transform(predScores.reshape(-1,1))
+    return predictions
 
-    # Classify test data according to threshold
-    # predictions = np.where(predScores >= thres, defs.posCode, defs.negCode)
+def ridge_log_reg(x_train, y_train, x_test, y_test, reg=1.0):
+    '''
+        Train Logistic Regression classifier on x_train and predict on x_test.
+
+        x_train, x_test: DataFrames of shape data x features.
+        reg: Regularization parameter. Multiplies penalty by 1/reg, so smaller
+        values mean stronger regularization.
+    '''
+
+    logReg = LogisticRegression(penalty='l2', C=reg, solver='liblinear', n_jobs=-1, max_iter=100)
+
+    logReg.fit(x_train, y_train)#, weights) # TODO: Add class weights
+
+    predictions = logReg.predict(x_test)
 
     return predictions

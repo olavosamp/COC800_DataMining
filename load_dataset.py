@@ -10,6 +10,8 @@ def load_dataset(path, fracPos=1.0, fracNeg=1.0, numPos=0, numNeg=0, randomState
     # Save each class
     classPos = pd.DataFrame(data[data.keys()[0]])
     classNeg = pd.DataFrame(data[data.keys()[1]])
+    print("\nclassPos: ", classPos.shape[0])
+    print("classNeg: ", classNeg.shape[0])
 
     # Sample a fraction of the data
     # doing this before anything else avoids memory issues

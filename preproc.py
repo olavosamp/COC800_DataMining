@@ -10,7 +10,6 @@ def preproc(dataDf, verbose=False):
     # Number of zero values per feature
     zeroValues = (dataDf == 0).sum(axis=0)
     allZeros   = (dataDf == 0).all(axis=0).sum()
-    # print("\nNumber of zero-valued entries per feature:\n", zeroValues)
 
     # Features containing only zeros will be dropped
     dataDf = dataDf.loc[:, (dataDf != 0).any(axis=0)]

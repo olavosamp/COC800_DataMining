@@ -1,14 +1,14 @@
 Modelos a implementar:
 
 Classificadores Lineares Generalizados
-  Regressão Logística
-    | com Regularização
+  Regressão Logística OK
+    | com Regularização OK
   Regressão Polinomial ? (cria novas features a partir de combinações lineares das originais)
-  Perceptron ?
+  Perceptron OK
 
 Naive Bayes OK
 
-(K-)Nearest Neighbours (usar ball tree)
+(K-)Nearest Neighbours (usar ball tree) OK
 
 Discriminador Linear      (LDA)
 Discriminador Quadrático  (QDA)
