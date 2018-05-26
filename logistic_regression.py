@@ -13,7 +13,7 @@ def log_reg(x_train, y_train, x_test, y_test):
         thres: Class discrimination threshold
     '''
 
-    logReg = LogisticRegression(penalty='l2', C=1.0, solver='liblinear', n_jobs=-1, max_iter=100)
+    logReg = LogisticRegression(penalty='l2', C=1.0, solver='liblinear', n_jobs=1, max_iter=100)
 
     logReg.fit(x_train, y_train)#, weights) # TODO: Add class weights
 
@@ -30,7 +30,7 @@ def ridge_log_reg(x_train, y_train, x_test, y_test, reg=1.0):
         values mean stronger regularization.
     '''
 
-    logReg = LogisticRegression(penalty='l2', C=reg, solver='liblinear', n_jobs=-1, max_iter=100)
+    logReg = LogisticRegression(penalty='l2', C=reg, solver='liblinear', n_jobs=1, max_iter=100)
 
     logReg.fit(x_train, y_train)#, weights) # TODO: Add class weights
 

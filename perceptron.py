@@ -14,7 +14,7 @@ def perceptron(x_train, y_train, x_test, y_test):
     '''
 
     classWeights = {defs.posCode: 0.5, defs.negCode: 0.5}
-    percep = Perceptron(shuffle=True, n_jobs=-1, class_weight=classWeights)
+    percep = Perceptron(shuffle=True, n_jobs=-1, class_weight=classWeights, max_iter=1000, tol=1e-3)
 
     # print("\nParameters initialization:")
     # print(percep.coef_)

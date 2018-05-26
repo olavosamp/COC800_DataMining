@@ -3,9 +3,8 @@ import pandas               as pd
 
 import dirs
 from load_dataset           import load_dataset
-from preproc                import preproc
+from preproc                import preproc, dimension_reduction
 from vis_functions          import (eigen_plot,
-                                    dimension_reduction,
                                     plot_3d,
                                     projection_plot,
                                     corr_matrix_plot,

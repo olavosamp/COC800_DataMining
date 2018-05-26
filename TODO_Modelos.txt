@@ -3,8 +3,8 @@ Modelos a implementar:
 Classificadores Lineares Generalizados
   Regressão Logística OK
     | com Regularização OK
-  Regressão Polinomial ? (cria novas features a partir de combinações lineares das originais)
   Perceptron OK
+  Regressão Polinomial ? (cria novas features a partir de combinações lineares das originais)
 
 Naive Bayes OK
 
@@ -15,7 +15,7 @@ Discriminador Quadrático  (QDA)
 
 Rede neural MLP
 
-Árvore de Classificação
+Árvore de Classificação OK
 Ensembles
   Bagging (Pasting algorithm)
   Random Forest

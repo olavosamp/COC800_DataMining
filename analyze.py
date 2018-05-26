@@ -1,12 +1,13 @@
 import numpy                as np
 import pandas               as pd
-import sklearn              as sk
+# import sklearn              as sk
 import time
+
+from sklearn.model_selection import train_test_split
 
 import dirs
 from load_dataset           import load_dataset
-from preproc                import preproc
-from sklearn.model_selection import train_test_split
+from preproc                import preproc, dimension_reduction
 
 from bayes                  import gaussian_naive_bayes
 from show_class_splits      import show_class_splits
@@ -14,6 +15,7 @@ from least_squares          import least_squares, ridge_least_squares
 from logistic_regression    import log_reg, ridge_log_reg
 from perceptron             import perceptron
 from nearest_neighbours     import nearest_neighbours
+from decision_trees         import decision_tree, random_forest, ada_boost
 
 # np.set_printoptions(precision=4)
 
@@ -36,38 +38,23 @@ show_class_splits(y_test)
 
 'Principal Components Analysis'
 '   useful to reduce dataset dimensionality'
-# compactDf = dimension_reduction(dataDf, keepComp=0)
+compactDf = dimension_reduction(dataDf, keepComp=60)
 
 print("\n\n---- Classification ----\n")
 
 'Bayesian Classifier'
+print("\nNaive Bayes")
 start = time.perf_counter()
 bayesPred = gaussian_naive_bayes(trainDf, y_train, testDf, y_test)
 elapsed = time.perf_counter() - start
-print("\nNaive Bayes")
 print("Elapsed: {:.2f}s".format(elapsed))
 print("Correct predictions {:.4f}".format(np.sum(bayesPred == y_test)/testSize))
 
-# ## Classificadores Lineares Generalizados
-# 'Least Squares'
-# lqPred = least_squares(trainDf, y_train, testDf, y_test)
-# print("\nLeast Squares")
-# print("Correct predictions ", np.sum(lqPred == y_test)/testSize)
-#
-# #| com Regularização
-# 'Least Squares with L2/Ridge Regularization'
-# rlqPred = ridge_least_squares(trainDf, y_train, testDf, y_test, regVal=5.0)
-# print("\nRidge Least Squares")
-# print("Correct predictions ", np.sum(rlqPred == y_test)/testSize)
-#
-# print("\nIs regression making a difference?\nPrediction vectors are {}/1.0 similar".format(np.sum(lqPred == rlqPred)/testSize))
-
-#   Regressão Logística | com Regularização
 'Logistic Regression'
+print("\nLogistic Regression")
 start = time.perf_counter()
 logPred = log_reg(trainDf, y_train, testDf, y_test)
 elapsed = time.perf_counter() - start
-print("\nLogistic Regression")
 print("Elapsed: {:.2f}s".format(elapsed))
 print("Correct predictions {:.4f}".format(np.sum(logPred == y_test)/testSize))
 
@@ -75,30 +62,59 @@ print("Correct predictions {:.4f}".format(np.sum(logPred == y_test)/testSize))
 # TODO: Testar LogisticRegressionCV, que encontra o C otimo
 logPenalty = 1/100
 
+print("\nLogistic Regression with L2 Regularization")
 start = time.perf_counter()
 rlogPred = ridge_log_reg(trainDf, y_train, testDf, y_test, reg=logPenalty)
 elapsed = time.perf_counter() - start
-print("\nLogistic Regression with L2 Regularization")
 print("Regularization paramenter (smaller is stronger): \n", logPenalty)
 print("Elapsed: {:.2f}s".format(elapsed))
 print("Correct predictions {:.4f}".format(np.sum(rlogPred == y_test)/testSize))
 
 'Linear Perceptron'
+print("\nLinear Perceptron")
 start = time.perf_counter()
 percepPred = perceptron(trainDf, y_train, testDf, y_test)
 elapsed = time.perf_counter() - start
-print("\nLinear Perceptron")
 print("Elapsed: {:.2f}s".format(elapsed))
 print("Correct predictions {:.4f}".format(np.sum(logPred == y_test)/testSize))
 
-'Nearest Neighbours'
-start = time.perf_counter()
-knnPred = nearest_neighbours(trainDf, y_train, testDf, y_test)
-elapsed = time.perf_counter() - start
-print("\nNearest Neighbours")
-print("Elapsed: {:.2f}s".format(elapsed))
-print("Correct predictions {:.4f}".format(np.sum(knnPred == y_test)/testSize))
+# 'Nearest Neighbours'
+# start = time.perf_counter()
+# knnPred = nearest_neighbours(trainDf, y_train, testDf, y_test)
+# elapsed = time.perf_counter() - start
+# print("\nNearest Neighbours")
+# print("Elapsed: {:.2f}s".format(elapsed))
+# print("Correct predictions {:.4f}".format(np.sum(knnPred == y_test)/testSize))
 
+'Decision Tree'
+print("\nDecision Tree")
+start = time.perf_counter()
+treePred = decision_tree(trainDf, y_train, testDf, y_test)
+elapsed = time.perf_counter() - start
+print("Elapsed: {:.2f}s".format(elapsed))
+print("Correct predictions {:.4f}".format(np.sum(treePred == y_test)/testSize))
+
+'Random Forest'
+print("\nRandom Forest")
+start = time.perf_counter()
+forestPred = random_forest(trainDf, y_train, testDf, y_test)
+elapsed = time.perf_counter() - start
+print("Elapsed: {:.2f}s".format(elapsed))
+print("Correct predictions {:.4f}".format(np.sum(forestPred == y_test)/testSize))
+
+'AdaBoost'
+print("\nAdaBoost")
+start = time.perf_counter()
+forestPred = ada_boost(trainDf, y_train, testDf, y_test)
+elapsed = time.perf_counter() - start
+print("Elapsed: {:.2f}s".format(elapsed))
+print("Correct predictions {:.4f}".format(np.sum(forestPred == y_test)/testSize))
+
+
+# Ensembles
+#   Bagging (Pasting algorithm)
+#   Random Forest
+#   Ada/Gradient Boost ou similares
 
 #   Regressão Polinomial (criação de novas features)
 
@@ -107,12 +123,6 @@ print("Correct predictions {:.4f}".format(np.sum(knnPred == y_test)/testSize))
 # Discriminador Quadrático  (QDA)
 #
 # Rede neural MLP
-#
-# Árvore de Classificação
-# Ensembles
-#   Bagging (Pasting algorithm)
-#   Random Forest
-#   Ada/Gradient Boost ou similares
 #
 # SVM Linear
 # SVM Outros kernels
