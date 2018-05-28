@@ -23,4 +23,4 @@ def nearest_neighbours(x_train, y_train, x_test, y_test):
 
     predictions = knn.predict(x_test)
 
-    return predictions,knn
+    return predictions, knn

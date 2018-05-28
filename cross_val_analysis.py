@@ -1,23 +1,25 @@
-import numpy as np
-from scipy import interp
-import matplotlib.pyplot as plt
-from itertools import cycle
-from sklearn.metrics import roc_curve, auc
+import numpy 				 as np
+import matplotlib.pyplot 	 as plt
+from scipy 					 import interp
+
+from sklearn.metrics 		 import roc_curve, auc
 from sklearn.model_selection import KFold
 
 def cross_val_analysis(n_split=10,classifier=None,trainDf=None, y_train=None):
-	'''#"Classification and ROC analysis
-	#Run classifier with cross-validation and plot ROC curves"'''
+	'''
+		Classification and ROC analysis
+		Run classifier with cross-validation and plot ROC curves
+	'''
 
 	kf = KFold(n_splits=n_split)
 	kf.get_n_splits(trainDf)
-		
+
 	tprs = []
 	aucs = []
 	mean_fpr = np.linspace(0, 1, 100)
 
 	i = 0
-	#start_time = time.time() 
+	#start_time = time.time()
 	for train, val in kf.split(trainDf,y_train):
 		print('Train Process for %i Fold'%(i+1))
 		#print("TRAIN:", train_index, "TEST:", test_index)

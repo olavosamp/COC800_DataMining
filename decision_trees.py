@@ -20,7 +20,7 @@ def decision_tree(x_train, y_train, x_test, y_test):
 
     predictions = tree.predict(x_test)
 
-    return predictions,tree
+    return predictions, tree
 
 def random_forest(x_train, y_train, x_test, y_test):
     '''
@@ -38,7 +38,7 @@ def random_forest(x_train, y_train, x_test, y_test):
 
     predictions = forest.predict(x_test)
 
-    return predictions,forest
+    return predictions, forest
 
 def ada_boost(x_train, y_train, x_test, y_test):
     '''
@@ -56,4 +56,4 @@ def ada_boost(x_train, y_train, x_test, y_test):
 
     predictions = ada.predict(x_test)
 
-    return predictions,ada
+    return predictions, ada

@@ -16,11 +16,12 @@ from logistic_regression    import log_reg, ridge_log_reg
 from perceptron             import perceptron
 from nearest_neighbours     import nearest_neighbours
 from decision_trees         import decision_tree, random_forest, ada_boost
+from discriminant_analysis  import linear_discriminant_analysis, quadratic_discriminant_analysis
 
 # np.set_printoptions(precision=4)
 
-numPos   = 20000   # Max of    63 981 samples
-numNeg   = 20000   # Max of 1 245 005 samples
+# numPos   = 20000   # Max of    63 981 samples
+# numNeg   = 20000   # Max of 1 245 005 samples
 
 print("\n\n---- Loading and Preprocessing ----")
 
@@ -45,7 +46,7 @@ print("\n\n---- Classification ----\n")
 'Bayesian Classifier'
 print("\nNaive Bayes")
 start = time.perf_counter()
-bayesPred = gaussian_naive_bayes(trainDf, y_train, testDf, y_test)
+bayesPred, _ = gaussian_naive_bayes(trainDf, y_train, testDf, y_test)
 elapsed = time.perf_counter() - start
 print("Elapsed: {:.2f}s".format(elapsed))
 # print("Correct predictions {:.4f}".format(np.sum(bayesPred == y_test)/testSize))
@@ -56,7 +57,7 @@ print("AUC     : {:.2f}".format(roc_auc_score(y_test, bayesPred)))
 'Logistic Regression'
 print("\nLogistic Regression")
 start = time.perf_counter()
-logPred = log_reg(trainDf, y_train, testDf, y_test)
+logPred, _ = log_reg(trainDf, y_train, testDf, y_test)
 elapsed = time.perf_counter() - start
 print("Elapsed: {:.2f}s".format(elapsed))
 # print("Correct predictions {:.4f}".format(np.sum(logPred == y_test)/testSize))
@@ -70,7 +71,7 @@ logPenalty = 1/100
 
 print("\nLogistic Regression with L2 Regularization")
 start = time.perf_counter()
-rlogPred = ridge_log_reg(trainDf, y_train, testDf, y_test, reg=logPenalty)
+rlogPred, _ = ridge_log_reg(trainDf, y_train, testDf, y_test, reg=logPenalty)
 elapsed = time.perf_counter() - start
 print("Regularization paramenter (smaller is stronger): \n", logPenalty)
 print("Elapsed: {:.2f}s".format(elapsed))
@@ -82,7 +83,7 @@ print("AUC     : {:.2f}".format(roc_auc_score(y_test, rlogPred)))
 'Linear Perceptron'
 print("\nLinear Perceptron")
 start = time.perf_counter()
-percepPred = perceptron(trainDf, y_train, testDf, y_test)
+percepPred, _ = perceptron(trainDf, y_train, testDf, y_test)
 elapsed = time.perf_counter() - start
 print("Elapsed: {:.2f}s".format(elapsed))
 # print("Correct predictions {:.4f}".format(np.sum(logPred == y_test)/testSize))
@@ -92,7 +93,7 @@ print("AUC     : {:.2f}".format(roc_auc_score(y_test, percepPred)))
 
 'Nearest Neighbours'
 start = time.perf_counter()
-knnPred = nearest_neighbours(trainDf, y_train, testDf, y_test)
+knnPred, _ = nearest_neighbours(trainDf, y_train, testDf, y_test)
 elapsed = time.perf_counter() - start
 print("\nNearest Neighbours")
 print("Elapsed: {:.2f}s".format(elapsed))
@@ -104,7 +105,7 @@ print("AUC     : {:.2f}".format(roc_auc_score(y_test, knnPred)))
 'Decision Tree'
 print("\nDecision Tree")
 start = time.perf_counter()
-treePred = decision_tree(trainDf, y_train, testDf, y_test)
+treePred, _ = decision_tree(trainDf, y_train, testDf, y_test)
 elapsed = time.perf_counter() - start
 print("Elapsed: {:.2f}s".format(elapsed))
 # print("Correct predictions {:.4f}".format(np.sum(treePred == y_test)/testSize))
@@ -115,7 +116,7 @@ print("AUC     : {:.2f}".format(roc_auc_score(y_test, treePred)))
 'Random Forest'
 print("\nRandom Forest")
 start = time.perf_counter()
-forestPred = random_forest(trainDf, y_train, testDf, y_test)
+forestPred, _ = random_forest(trainDf, y_train, testDf, y_test)
 elapsed = time.perf_counter() - start
 print("Elapsed: {:.2f}s".format(elapsed))
 # print("Correct predictions {:.4f}".format(np.sum(forestPred == y_test)/testSize))
@@ -126,7 +127,7 @@ print("AUC     : {:.2f}".format(roc_auc_score(y_test, forestPred)))
 'AdaBoost'
 print("\nAdaBoost")
 start = time.perf_counter()
-adaPred = ada_boost(trainDf, y_train, testDf, y_test)
+adaPred, _ = ada_boost(trainDf, y_train, testDf, y_test)
 elapsed = time.perf_counter() - start
 print("Elapsed: {:.2f}s".format(elapsed))
 # print("Correct predictions {:.4f}".format(np.sum(adaPred == y_test)/testSize))
@@ -134,6 +135,27 @@ print("Accuracy: {:.2f}".format(accuracy_score(y_test, adaPred, normalize=True))
 print("F1 Score: {:.2f}".format(f1_score(y_test, adaPred)))
 print("AUC     : {:.2f}".format(roc_auc_score(y_test, adaPred)))
 
+'Linear Discriminant Analysis'
+print("\nLinear Discriminant Analysis")
+start = time.perf_counter()
+ldaPred, _ = linear_discriminant_analysis(trainDf, y_train, testDf, y_test, n_components=None)
+elapsed = time.perf_counter() - start
+print("Elapsed: {:.2f}s".format(elapsed))
+# print("Correct predictions {:.4f}".format(np.sum(adaPred == y_test)/testSize))
+print("Accuracy: {:.2f}".format(accuracy_score(y_test, ldaPred, normalize=True)))
+print("F1 Score: {:.2f}".format(f1_score(y_test, ldaPred)))
+print("AUC     : {:.2f}".format(roc_auc_score(y_test, ldaPred)))
+
+'Quadratic Discriminant Analysis'
+print("\nQuadratic Discriminant Analysis")
+start = time.perf_counter()
+qdaPred, _ = linear_discriminant_analysis(trainDf, y_train, testDf, y_test)
+elapsed = time.perf_counter() - start
+print("Elapsed: {:.2f}s".format(elapsed))
+# print("Correct predictions {:.4f}".format(np.sum(adaPred == y_test)/testSize))
+print("Accuracy: {:.2f}".format(accuracy_score(y_test, qdaPred, normalize=True)))
+print("F1 Score: {:.2f}".format(f1_score(y_test, qdaPred)))
+print("AUC     : {:.2f}".format(roc_auc_score(y_test, qdaPred)))
 
 # Ensembles
 #   Bagging (Pasting algorithm)

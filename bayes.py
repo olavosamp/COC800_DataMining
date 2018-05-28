@@ -14,4 +14,4 @@ def gaussian_naive_bayes(dataDf, labels, testDf, testLabels):
 
     predictions = gnb.predict(testDf)
 
-    return predictions,gnb
+    return predictions, gnb

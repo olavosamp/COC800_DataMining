@@ -1,13 +1,11 @@
-from sklearn.decomposition import PCA
 import numpy                as np
 import pandas               as pd
-from sklearn.linear_model   import LinearRegression, Ridge
-from sklearn.preprocessing  import MinMaxScaler
+
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
+
 import dirs
 import defines              as defs
-
 
 def linear_discriminant_analysis(x_train, y_train, x_test, y_test, n_components=2):
     '''
@@ -17,13 +15,14 @@ def linear_discriminant_analysis(x_train, y_train, x_test, y_test, n_components=
         n_components: Number of components (< n_classes - 1) for dimensionality reduction.
     '''
 
-    lda = LinearDiscriminantAnalysis(n_components=n_components)
+    # classWeights = {defs.posCode: 0.5, defs.negCode: 0.5}
+    lda = LinearDiscriminantAnalysis(priors=None, n_components=n_components)
     #X_r2 = lda.fit(x_train, y_train).transform(X)
     lda.fit(x_train, y_train)
 
     predictions = lda.predict(x_test)
 
-    return predictions,lda
+    return predictions, lda
 
 def quadratic_discriminant_analysis(x_train, y_train, x_test, y_test):
     '''
@@ -33,10 +32,11 @@ def quadratic_discriminant_analysis(x_train, y_train, x_test, y_test):
         n_components: Number of components (< n_classes - 1) for dimensionality reduction.
     '''
 
+    # classWeights = {defs.posCode: 0.5, defs.negCode: 0.5}
     qda = QuadraticDiscriminantAnalysis()
     #X_r2 = lda.fit(x_train, y_train).transform(X)
     qda.fit(x_train, y_train)
 
     predictions = qda.predict(x_test)
 
-    return predictions,qda
+    return predictions, qda
