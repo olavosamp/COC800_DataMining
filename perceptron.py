@@ -23,4 +23,4 @@ def perceptron(x_train, y_train, x_test, y_test):
 
     predictions = percep.predict(x_test)
 
-    return predictions
+    return predictions,percep

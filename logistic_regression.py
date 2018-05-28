@@ -19,7 +19,7 @@ def log_reg(x_train, y_train, x_test, y_test):
 
     predictions = logReg.predict(x_test)
 
-    return predictions
+    return predictions,logReg
 
 def ridge_log_reg(x_train, y_train, x_test, y_test, reg=1.0):
     '''
@@ -36,4 +36,4 @@ def ridge_log_reg(x_train, y_train, x_test, y_test, reg=1.0):
 
     predictions = logReg.predict(x_test)
 
-    return predictions
+    return predictions,logReg
