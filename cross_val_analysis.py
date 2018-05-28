@@ -2,31 +2,54 @@ import numpy as np
 from scipy import interp
 import matplotlib.pyplot as plt
 from itertools import cycle
-from sklearn.metrics import roc_curve, auc
+from sklearn.metrics import f1_score, accuracy_score, roc_auc_score,precision_score,recall_score,classification_report,roc_curve,auc
 from sklearn.model_selection import KFold
+fig, ax = plt.subplots(1,figsize=(15,10))
 
-def cross_val_analysis(n_split=10,classifier=None,trainDf=None, y_train=None):
+def cross_val_analysis(n_split=10,classifier=None,x=None, y=None,model_name=""):
 	'''#"Classification and ROC analysis
 	#Run classifier with cross-validation and plot ROC curves"'''
 
 	kf = KFold(n_splits=n_split)
-	kf.get_n_splits(trainDf)
+	kf.get_n_splits(x)
 		
 	tprs = []
+	fpr_ = []
+	tpr_ = []
 	aucs = []
+	accuracy_ = []
+	f1_score_ = []
+	precision_ = []
+	recall_ = []	
+	roc_auc_ = []
+
+	metrics_ = {}
 	mean_fpr = np.linspace(0, 1, 100)
 
 	i = 0
 	#start_time = time.time() 
-	for train, val in kf.split(trainDf,y_train):
-		print('Train Process for %i Fold'%(i+1))
+	for train, val in kf.split(x,y):
+		#print('Train Process for %i Fold'%(i+1))
 		#print("TRAIN:", train_index, "TEST:", test_index)
 		#trainX, valX = trainDf[train_index], trainDf[val_index]
 		#trainY, valY = y_train[train_index], y_train[val_index]
-		probas_ = classifier.fit(trainDf.iloc[train], y_train[train]).predict_proba(trainDf.iloc[val])
+		model = classifier.fit(x.iloc[train], y[train])
+                pred_ = model.predict(x.iloc[val])
+		probas_ = model.predict_proba(x.iloc[val])
+
+		# Metrics evaluation
+		accuracy_.append(100*accuracy_score(y[val],pred_ , normalize=True))
+		f1_score_.append(100*f1_score(y[val], pred_))
+		roc_auc_.append(100*roc_auc_score(y[val], pred_))
+		precision_.append(100*precision_score(y[val], pred_))
+		recall_.append(100*recall_score(y[val], pred_))
+		
+
 		# Compute ROC curve and area the curve
-		fpr, tpr, thresholds = roc_curve(y_train[val], probas_[:, 1])
+		fpr, tpr, thresholds = roc_curve(y[val], probas_[:, 1])
 		tprs.append(interp(mean_fpr, fpr, tpr))
+		fpr_.append(fpr)
+		tpr_.append(tpr)
 		tprs[-1][0] = 0.0
 		roc_auc = auc(fpr, tpr)
 		aucs.append(roc_auc)
@@ -36,6 +59,24 @@ def cross_val_analysis(n_split=10,classifier=None,trainDf=None, y_train=None):
 		i += 1
 	plt.plot([0, 1], [0, 1], linestyle='--', lw=2, color='r',
 			 label='Luck', alpha=.8)
+
+	#Store average and std metrics in dict
+	metrics_['model']=model_name 
+	metrics_['accuracy']=round(np.mean(accuracy_),2)
+	metrics_['accuracy_std']=round(np.std(accuracy_),2)
+        #metrics_['fpr']=round(np.mean(fpr_),2)
+        #metrics_['fpr_std']=round(np.std(fpr_),2)
+        #metrics_['tpr']=round(np.mean(tpr_),2)
+        #metrics_['tpr_std']=round(np.std(tpr_),2)
+        metrics_['precision']=round(np.mean(precision_),2)
+        metrics_['precision_std']=round(np.std(precision_),2)
+        metrics_['recall']=round(np.mean(recall_),2)
+        metrics_['recall_std']=round(np.std(recall_),2)
+        metrics_['roc_auc']=round(np.mean(roc_auc_),2)
+        metrics_['roc_auc_std']=round(np.std(roc_auc_),2)
+        metrics_['f1']=round(np.mean(f1_score_),2)
+        metrics_['f1_std']=round(np.std(f1_score_),2)
+
 
 	mean_tpr = np.mean(tprs, axis=0)
 	mean_tpr[-1] = 1.0
@@ -55,6 +96,8 @@ def cross_val_analysis(n_split=10,classifier=None,trainDf=None, y_train=None):
 	plt.ylim([-0.05, 1.05])
 	plt.xlabel('False Positive Rate')
 	plt.ylabel('True Positive Rate')
-	plt.title('Receiver operating characteristic example')
+	plt.title(model_name+' Receiver operating characteristic')
 	plt.legend(loc="lower right")
 	plt.show()
+	
+	return metrics_

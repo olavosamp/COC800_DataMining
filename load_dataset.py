@@ -12,8 +12,8 @@ def load_dataset(path, fracPos=1.0, fracNeg=1.0, numPos=0, numNeg=0, randomState
     classNeg = pd.DataFrame(data[data.keys()[1]])
 
     print("\nOriginal data:")
-    print("Positive examples: {:6d}",.format(classPos.shape[0]))
-    print("Negative examples: {:6d}",.format(classNeg.shape[0]))
+    print("Positive examples: {:6d}".format(classPos.shape[0]))
+    print("Negative examples: {:6d}".format(classNeg.shape[0]))
 
     # Sample a fraction of the data
     # doing this before anything else avoids memory issues
@@ -58,8 +58,8 @@ def load_dataset(path, fracPos=1.0, fracNeg=1.0, numPos=0, numNeg=0, randomState
     labels = np.concatenate((yPos, yNeg))
 
     print("\n\nData loaded with following class distribution: ")
-    print("Positive class: {:3.2f} %, {} entries ".format(entriesPos/total*100, entriesPos))
-    print("Negative class: {:3.2f} %, {} entries ".format(entriesNeg/total*100, entriesNeg))
+    print("Positive class: {:5.2f} %, {} entries ".format(entriesPos/total*100, entriesPos))
+    print("Negative class: {:5.2f} %, {} entries ".format(entriesNeg/total*100, entriesNeg))
     print("Total:          {} entries".format(total))
 
     # Save dataset in a DataFrame
