@@ -64,6 +64,5 @@ def load_dataset(path, fracPos=1.0, fracNeg=1.0, numPos=0, numNeg=0, randomState
 
     # Save dataset in a DataFrame
     dataDf = pd.concat((classPos, classNeg), axis=0)
-    # dataDf = dataDf.assign(Labels=labels)
 
     return dataDf, labels
