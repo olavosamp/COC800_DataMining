@@ -10,8 +10,8 @@ Naive Bayes OK
 
 (K-)Nearest Neighbours (usar ball tree) OK
 
-Discriminador Linear      (LDA)
-Discriminador Quadrático  (QDA)
+Discriminador Linear      (LDA) OK
+Discriminador Quadrático  (QDA) OK
 
 Rede neural MLP
 

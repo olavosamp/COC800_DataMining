@@ -2,15 +2,16 @@ import numpy 				 as np
 import matplotlib.pyplot 	 as plt
 from scipy 					 import interp
 
-# from itertools 				 import cycle
-from sklearn.metrics 		 import f1_score, accuracy_score, roc_auc_score, precision_score, recall_score, classification_report, roc_curve,auc
+from sklearn.metrics 		 import (f1_score,
+									accuracy_score,
+									roc_auc_score,
+									precision_score,
+									recall_score,
+									classification_report,
+									roc_curve,
+									auc)
 from sklearn.model_selection import KFold
-# from keras.models 			 import Sequential
-# from keras.layers.core 		 import Dense, Activation, Dropout
-# from keras.optimizers 		 import Adam, SGD
 import keras.callbacks 		 as callbacks
-
-from neural_networks 		 import multi_layer_perceptron
 
 fig, ax = plt.subplots(1, figsize=(15,10))
 
@@ -18,6 +19,9 @@ def cross_val_analysis(n_split=10, classifier=None, x=None, y=None, model_name="
 	'''
 		Classification and ROC analysis
 		Run classifier with cross-validation and plot ROC curves
+
+		Returns:
+			metrics_: Dict of metrics
 	'''
 	kf = KFold(n_splits=n_split)
 	kf.get_n_splits(x)
@@ -43,7 +47,7 @@ def cross_val_analysis(n_split=10, classifier=None, x=None, y=None, model_name="
 		#trainX, valX = trainDf[train_index], trainDf[val_index]
 		#trainY, valY = y_train[train_index], y_train[val_index]
 		model   = classifier.fit(x.iloc[train], y[train])
-        pred_   = model.predict(x.iloc[val])
+		pred_   = model.predict(x.iloc[val])
 		probas_ = model.predict_proba(x.iloc[val])
 
 		# Metrics evaluation
@@ -75,14 +79,14 @@ def cross_val_analysis(n_split=10, classifier=None, x=None, y=None, model_name="
 	metrics_['model']			= model_name
 	metrics_['accuracy']		= np.mean(accuracy_)
 	metrics_['accuracy_std']	= np.std(accuracy_)
-    metrics_['precision']		= np.mean(precision_)
-    metrics_['precision_std']	= np.std(precision_)
-    metrics_['recall']			= np.mean(recall_)
-    metrics_['recall_std']		= np.std(recall_)
-    metrics_['roc_auc']			= np.mean(roc_auc_)
-    metrics_['roc_auc_std']		= np.std(roc_auc_)
-    metrics_['f1']				= np.mean(f1_score_)
-    metrics_['f1_std']			= np.std(f1_score_)
+	metrics_['precision']		= np.mean(precision_)
+	metrics_['precision_std']	= np.std(precision_)
+	metrics_['recall']			= np.mean(recall_)
+	metrics_['recall_std']		= np.std(recall_)
+	metrics_['roc_auc']			= np.mean(roc_auc_)
+	metrics_['roc_auc_std']		= np.std(roc_auc_)
+	metrics_['f1']				= np.mean(f1_score_)
+	metrics_['f1_std']			= np.std(f1_score_)
 	#metrics_['fpr']			= np.mean(fpr_)
 	#metrics_['fpr_std']		= np.std(fpr_)
 	#metrics_['tpr']			= np.mean(tpr_)

@@ -7,11 +7,12 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics         import f1_score, accuracy_score, roc_auc_score
 
 import dirs
+import defines              as defs
 from load_dataset           import load_dataset
 from preproc                import preproc, dimension_reduction
+from utils                  import show_class_splits
 
 from bayes                  import gaussian_naive_bayes
-from show_class_splits      import show_class_splits
 from logistic_regression    import log_reg, ridge_log_reg
 from perceptron             import perceptron
 from nearest_neighbours     import nearest_neighbours
@@ -157,17 +158,10 @@ print("Accuracy: {:.2f}".format(accuracy_score(y_test, qdaPred, normalize=True))
 print("F1 Score: {:.2f}".format(f1_score(y_test, qdaPred)))
 print("AUC     : {:.2f}".format(roc_auc_score(y_test, qdaPred)))
 
-# Ensembles
-#   Bagging (Pasting algorithm)
-#   Random Forest
-#   Ada/Gradient Boost ou similares
 
 #   Regressão Polinomial (criação de novas features)
 
-#
-# Discriminador Linear      (LDA)
-# Discriminador Quadrático  (QDA)
-#
+
 # Rede neural MLP
 #
 # SVM Linear
