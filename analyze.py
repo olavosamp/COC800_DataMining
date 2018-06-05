@@ -12,12 +12,12 @@ from load_dataset           import load_dataset
 from preproc                import preproc, dimension_reduction
 from utils                  import show_class_splits
 
-from bayes                  import gaussian_naive_bayes
-from logistic_regression    import log_reg, ridge_log_reg
-from perceptron             import perceptron
-from nearest_neighbours     import nearest_neighbours
-from decision_trees         import decision_tree, random_forest, ada_boost
-from discriminant_analysis  import linear_discriminant_analysis, quadratic_discriminant_analysis
+from analysis_functions             import (gaussian_naive_bayes,
+                                            log_reg, ridge_log_reg,
+                                            perceptron,
+                                            nearest_neighbours,
+                                            decision_tree, random_forest, ada_boost,
+                                            linear_discriminant_analysis, quadratic_discriminant_analysis)
 
 # np.set_printoptions(precision=4)
 
@@ -26,7 +26,7 @@ from discriminant_analysis  import linear_discriminant_analysis, quadratic_discr
 
 print("\n\n---- Loading and Preprocessing ----")
 
-dataDf, labels = load_dataset(dirs.dataset, randomState=None, fracPos=0.06, fracNeg=0.06)#numPos=numPos, numNeg=numNeg)
+dataDf, labels = load_dataset(dirs.dataset, randomState=None, fracPos=defs.fracPos, fracNeg=defs.fracNeg)#numPos=numPos, numNeg=numNeg)
 dataDf = preproc(dataDf, verbose=False)
 # labeledDf = dataDf.assign(Labels=labels)
 

@@ -11,17 +11,33 @@ def show_class_splits(labels):
     print("Negative class: {:5.2f} %, {} entries ".format(entriesNeg/total*100, entriesNeg))
     print("Total:          {} entries".format(total))
 
-    return
+    return defs.success
 
 def print_metrics(metricsDict):
     for key in metricsDict.keys():
         if isinstance(metricsDict[key], float):
             print("{:15}: {:.2f}".format(key, metricsDict[key]))
-        # elif isinstance(metricsDict[key], string)::
         else:
             print("{:15}: {}".format(key, metricsDict[key]))
 
-    return None
+    return defs.success
+
+def report_performance(labels, predictions, elapsed=0, model_name="", report=True):
+    from sklearn.metrics         import f1_score, accuracy_score, roc_auc_score, precision_score, recall_score
+    metrics = {}
+
+    metrics['Elapsed']      = elapsed
+    metrics['Model']		= model_name
+    metrics['accuracy']		= accuracy_score(labels, predictions, normalize=True)
+    metrics['f1']     		= f1_score(labels, predictions)
+    metrics['auc']			= roc_auc_score(labels, predictions)
+    metrics['precision']	= precision_score(labels, predictions)
+    metrics['recall']		= recall_score(labels, predictions)
+
+    if report == True:
+        print_metrics(metrics)
+
+    return metrics
 
 # def get_class_weights(y):
 #     '''

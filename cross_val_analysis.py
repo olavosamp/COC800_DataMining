@@ -2,6 +2,7 @@ import numpy 				 as np
 import matplotlib.pyplot 	 as plt
 from scipy 					 import interp
 
+from sklearn.model_selection import KFold
 from sklearn.metrics 		 import (f1_score,
 									accuracy_score,
 									roc_auc_score,
@@ -10,7 +11,6 @@ from sklearn.metrics 		 import (f1_score,
 									classification_report,
 									roc_curve,
 									auc)
-from sklearn.model_selection import KFold
 import keras.callbacks 		 as callbacks
 
 fig, ax = plt.subplots(1, figsize=(15,10))
@@ -117,7 +117,8 @@ def cross_val_analysis(n_split=10, classifier=None, x=None, y=None, model_name="
 
 	return metrics_
 
-def cross_val_analysis_nn(n_split=10,classifier=None,x=None, y=None,model_name="",patience=30,train_verbose=2,n_epochs=500):
+def cross_val_analysis_nn(n_split=10, classifier=None, x=None, y=None, model_name="",
+						  patience=30, train_verbose=2, n_epochs=500):
 	'''
 		Classification and ROC analysis
 		Run classifier with cross-validation and plot ROC curves
@@ -149,9 +150,9 @@ def cross_val_analysis_nn(n_split=10,classifier=None,x=None, y=None,model_name="
 		#trainX, valX = trainDf[train_index], trainDf[val_index]
 		#trainY, valY = y_train[train_index], y_train[val_index]
 
-		earlyStopping = callbacks.EarlyStopping(monitor='val_loss',patience=patience,verbose=train_verbose,mode='auto')
-		model = classifier.fit(x.iloc[train], y[train],nb_epoch=n_epochs,callbacks=[earlyStopping],verbose=train_verbose,validation_data=(x.iloc[val],y[val]))
-		trn_desc[i]=model
+		earlyStopping = callbacks.EarlyStopping(monitor='val_loss', patience=patience, verbose=train_verbose, mode='auto')
+		model = classifier.fit(x.iloc[train], y[train], nb_epoch=n_epochs, callbacks=[earlyStopping], verbose=train_verbose, validation_data=(x.iloc[val], y[val]))
+		trn_desc[i] = model
 		#model = classifier.fit(x.iloc[train], y[train])
 		pred_ = model.predict(x.iloc[val])
 		probas_ = model.predict_proba(x.iloc[val])
