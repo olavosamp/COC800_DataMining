@@ -1,6 +1,8 @@
-import numpy                as np
-import pandas               as pd
-import defines              as defs
+import numpy        as np
+import pandas       as pd
+import defines      as defs
+
+from collections    import OrderedDict
 
 def show_class_splits(labels):
     entriesPos = np.sum(labels == defs.posCode)
@@ -24,7 +26,7 @@ def print_metrics(metricsDict):
 
 def report_performance(labels, predictions, elapsed=0, model_name="", report=True):
     from sklearn.metrics         import f1_score, accuracy_score, roc_auc_score, precision_score, recall_score
-    metrics = {}
+    metrics = OrderedDict()
 
     metrics['Elapsed']      = elapsed
     metrics['Model']		= model_name

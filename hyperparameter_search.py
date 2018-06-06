@@ -34,16 +34,43 @@ def hyp_logistic_regression(x_train, y_train, x_test, num_iter=10):
                                 class_weight='balanced', n_jobs=1)
 
     params = {'C': expon()}
-    logHyp = RandomizedSearchCV(model, params, n_iter=num_iter, scoring='f1', cv=10,
+    hypModel = RandomizedSearchCV(model, params, n_iter=num_iter, scoring='f1', cv=10,
                                 n_jobs=-1, error_score='raise', verbose=0)
 
-    logHyp.fit(trainDf, y_train)
+    hypModel.fit(trainDf, y_train)
 
-    print("\nBest parameters:", logHyp.best_params_)
+    print("\nBest parameters:", hypModel.best_params_)
 
-    logPred = logHyp.predict(testDf)
+    predictions = hypModel.predict(testDf)
 
-    return logPred
+    return predictions
+
+def hyp_perceptron(x_train, y_train, x_test, num_iter=10):
+    '''
+        Perform Hyperparameter search for Linear Perceptron model on train and
+        validation sets, evaluate best estimator on test set.
+
+        Returns test set predictions
+    '''
+    from scipy.stats             import expon
+    from sklearn.model_selection import RandomizedSearchCV
+    from sklearn.linear_model    import Perceptron
+
+
+    model = Perceptron(shuffle=True, class_weight=None, max_iter=1000, penalty='l2',
+                        alpha=1.0, tol=1e-3)
+
+    params = {'alpha': expon()}
+    hypModel = RandomizedSearchCV(model, params, n_iter=num_iter, scoring='f1', cv=10,
+                                n_jobs=-1, error_score='raise', verbose=0)
+
+    hypModel.fit(trainDf, y_train)
+
+    print("\nBest parameters:", hypModel.best_params_)
+
+    predictions = hypModel.predict(testDf)
+
+    return predictions
 
 if __name__ == "__main__":
     print("\n\n---- Loading and Preprocessing ----")
@@ -64,17 +91,30 @@ if __name__ == "__main__":
     # compactDf = dimension_reduction(dataDf, keepComp=60)
 
     print("\n\n---- Hyperparameter search ----\n")
-
-    'Logistic Regression with L2 Regularization'
-    # TODO: Testar LogisticRegressionCV, que encontra o C otimo
-    modelName = "Logistic Regression with L2 Regularization"
+    # 
+    # 'Logistic Regression with L2 Regularization'
+    # # TODO: Testar LogisticRegressionCV, que encontra o C otimo
+    # modelName = "Logistic Regression with L2 Regularization"
+    # numIter = 10
+    #
+    # print("\n", modelName)
+    #
+    # start   = time.perf_counter()
+    # bestPred = hyp_logistic_regression(trainDf, y_train, testDf, num_iter=10)
+    # elapsed = time.perf_counter() - start
+    #
+    # metricsLogRegTest = report_performance(y_test, bestPred, elapsed=elapsed, model_name=modelName)
+    # print("")
+    #
+    'Linear Perceptron'
+    modelName = "Linear Perceptron"
     numIter = 10
 
     print("\n", modelName)
 
     start   = time.perf_counter()
-    bestPred = hyp_logistic_regression(trainDf, y_train, testDf, num_iter=10)
+    bestPred = hyp_perceptron(trainDf, y_train, testDf, num_iter=10)
     elapsed = time.perf_counter() - start
 
-    metricsLogReg = report_performance(y_test, bestPred, elapsed=elapsed, model_name=modelName)
+    metricsPercepTest = report_performance(y_test, bestPred, elapsed=elapsed, model_name=modelName)
     print("")
