@@ -28,7 +28,6 @@ print("\n\n---- Loading and Preprocessing ----")
 
 dataDf, labels = load_dataset(dirs.dataset, randomState=None, fracPos=defs.fracPos, fracNeg=defs.fracNeg)#numPos=numPos, numNeg=numNeg)
 dataDf = preproc(dataDf, verbose=False)
-# labeledDf = dataDf.assign(Labels=labels)
 
 testSize = round(dataDf.shape[0]*0.2)
 trainDf, testDf, y_train, y_test = train_test_split(dataDf, labels, test_size=testSize)

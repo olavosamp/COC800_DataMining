@@ -45,11 +45,10 @@ def hyp_logistic_regression(x_train, y_train, x_test, num_iter=10):
 
     return logPred
 
-
 if __name__ == "__main__":
     print("\n\n---- Loading and Preprocessing ----")
 
-    dataDf, labels = load_dataset(dirs.dataset, randomState=defs.standardSample, fracPos=0.03, fracNeg=0.03)#numPos=numPos, numNeg=numNeg)
+    dataDf, labels = load_dataset(dirs.dataset, randomState=defs.standardSample, fracPos=defs.fracPos, fracNeg=defs.fracNeg)#numPos=numPos, numNeg=numNeg)
     dataDf = preproc(dataDf, verbose=False)
 
     testSize = round(dataDf.shape[0]*0.2)

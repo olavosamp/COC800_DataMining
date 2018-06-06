@@ -1,6 +1,5 @@
 import numpy                as np
 import pandas               as pd
-# import sklearn              as sk
 import time
 
 from sklearn.model_selection import train_test_split
@@ -24,7 +23,7 @@ from analysis_functions             import (gaussian_naive_bayes,
 
 print("\n\n---- Loading and Preprocessing ----")
 
-dataDf, labels = load_dataset(dirs.dataset, randomState=defs.standardSample, fracPos=0.04, fracNeg=0.04)#numPos=numPos, numNeg=numNeg)
+dataDf, labels = load_dataset(dirs.dataset, randomState=defs.standardSample, fracPos=defs.fracPos, fracNeg=defs.fracNeg)#numPos=numPos, numNeg=numNeg)
 dataDf = preproc(dataDf, verbose=False)
 
 testSize = round(dataDf.shape[0]*0.2)
