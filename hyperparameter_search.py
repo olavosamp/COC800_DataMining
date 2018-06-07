@@ -9,7 +9,7 @@ import dirs
 import defines              as defs
 from load_dataset           import load_dataset
 from preproc                import preproc, dimension_reduction
-from utils                  import show_class_splits, report_performance
+from utils                  import show_class_splits, report_performance, save_results
 # from cross_val_analysis     import cross_val_analysis
 
 # from analysis_functions             import (gaussian_naive_bayes,
@@ -56,7 +56,6 @@ def hyp_knn(x_train, y_train, x_test):
 
         Returns test set predictions
     '''
-    from scipy.stats             import expon
     from sklearn.model_selection import GridSearchCV
     from sklearn.neighbors       import KNeighborsClassifier
 
@@ -74,6 +73,32 @@ def hyp_knn(x_train, y_train, x_test):
     predictions = hypModel.predict(testDf)
 
     return predictions, hypModel.cv_results_
+
+def hyp_decision_tree(x_train, y_train, x_test):
+    '''
+        Perform Hyperparameter search for Decision Tree on train and
+        validation sets, evaluate best estimator on test set.
+
+        Returns test set predictions
+    '''
+    from sklearn.model_selection import GridSearchCV
+    from sklearn.tree            import DecisionTreeClassifier
+
+    classWeights = {defs.posCode: 0.5, defs.negCode: 0.5}
+    model = DecisionTreeClassifier(class_weight="balanced", criterion='entropy', max_depth=15, min_samples_leaf=5)
+
+    params = {'max_depth': list(range(2, 31, 2))}
+    hypModel = GridSearchCV(model, params, scoring='f1', cv=10, n_jobs=4, error_score='raise',
+                            verbose=2, return_train_score=True)
+
+    hypModel.fit(trainDf, y_train)
+
+    print("\nBest parameters:", hypModel.best_params_)
+
+    predictions = hypModel.predict(testDf)
+
+    return predictions, hypModel.cv_results_
+
 
 if __name__ == "__main__":
     print("\n\n---- Loading and Preprocessing ----")
@@ -96,10 +121,7 @@ if __name__ == "__main__":
     # compactDf = dimension_reduction(dataDf, keepComp=60)
 
     print("\n\n---- Hyperparameter search ----\n")
-    try:
-        os.makedirs(dirs.results)
-    except OSError:
-        pass
+
 
     #
     # 'Logistic Regression with L2 Regularization'
@@ -115,20 +137,29 @@ if __name__ == "__main__":
     #
     # metricsLogRegTest = report_performance(y_test, bestPred, elapsed=elapsed, model_name=modelName)
     # print("")
+
+    # 'Nearest Neighbors'
+    # modelName = "Nearest Neighbors"
+    # print("\n", modelName)
     #
-    'Nearest Neighbors'
-    modelName = "Nearest Neighbors"
+    # start   = time.perf_counter()
+    # bestPred, cvResults = hyp_knn(trainDf, y_train, testDf)
+    # elapsed = time.perf_counter() - start
+    #
+    # metricsPercepTest = report_performance(y_test, bestPred, elapsed=elapsed, model_name=modelName)
+    #
+    # save_results(cvResults, bestPred, modelName)
+    # print("")
+
+    'Decision Tree'
+    modelName = "Decision Tree"
     print("\n", modelName)
 
     start   = time.perf_counter()
-    bestPred, cvResults = hyp_knn(trainDf, y_train, testDf)
+    bestPred, cvResults = hyp_decision_tree(trainDf, y_train, testDf)
     elapsed = time.perf_counter() - start
 
     metricsPercepTest = report_performance(y_test, bestPred, elapsed=elapsed, model_name=modelName)
 
-    cvResultsPath = dirs.results+modelName.replace(" ", "_")+"_cv_results"
-    bestPredPath  = dirs.results+modelName.replace(" ", "_")+"_best_pred"
-    np.save(cvResultsPath, cvResults)
-    np.save(bestPredPath,  bestPred)
-
+    save_results(cvResults, bestPred, modelName)
     print("")

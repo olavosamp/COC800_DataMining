@@ -1,5 +1,6 @@
 import numpy        as np
 import pandas       as pd
+
 import defines      as defs
 
 from collections    import OrderedDict
@@ -40,6 +41,36 @@ def report_performance(labels, predictions, elapsed=0, model_name="", report=Tru
         print_metrics(metrics)
 
     return metrics
+
+def save_results(cvResults, predictions, modelName):
+    import os
+    import dirs
+
+    try:
+        os.makedirs(dirs.results)
+    except OSError:
+        pass
+
+    cvResultsPath = dirs.results+modelName.replace(" ", "_")+"_cv_results.csv"
+    predPath      = dirs.results+modelName.replace(" ", "_")+"_best_pred.npy"
+
+    resultsDf = pd.DataFrame(cvResults)
+
+    resultsDf.to_csv(cvResultsPath)
+    np.save(predPath,  predictions)
+
+    return defs.success
+
+def load_results(modelName):
+    import dirs
+
+    cvResultsPath = dirs.results+modelName.replace(" ", "_")+"_cv_results.csv"
+    predPath      = dirs.results+modelName.replace(" ", "_")+"_best_pred.npy"
+
+    resultsDf   = pd.DataFrame(pd.read_csv(cvResultsPath))
+    predictions = np.load(predPath)
+
+    return resultsDf, predictions
 
 # def get_class_weights(y):
 #     '''
