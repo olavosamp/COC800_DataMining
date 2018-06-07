@@ -26,11 +26,13 @@ from analysis_functions             import (gaussian_naive_bayes,
 
 print("\n\n---- Loading and Preprocessing ----")
 
-dataDf, labels = load_dataset(dirs.dataset, randomState=None, fracPos=defs.fracPos, fracNeg=defs.fracNeg)#numPos=numPos, numNeg=numNeg)
+dataDf, labels = load_dataset(dirs.dataset, randomState=defs.standardSample,
+                                fracPos=defs.fracPos, fracNeg=defs.fracNeg)#numPos=numPos, numNeg=numNeg)
 dataDf = preproc(dataDf, verbose=False)
 
-testSize = round(dataDf.shape[0]*0.2)
-trainDf, testDf, y_train, y_test = train_test_split(dataDf, labels, test_size=testSize)
+testSize = round(dataDf.shape[0]*defs.fracTest)
+trainDf, testDf, y_train, y_test = train_test_split(dataDf, labels, test_size=testSize,
+                                                    random_state=defs.standardSample)
 
 print("\nTrain data loaded with following class distributions:")
 show_class_splits(y_train)

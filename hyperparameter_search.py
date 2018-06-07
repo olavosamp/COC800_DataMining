@@ -1,6 +1,7 @@
 import numpy                as np
 import pandas               as pd
 import time
+import os
 
 from sklearn.model_selection import train_test_split, RandomizedSearchCV
 
@@ -22,6 +23,9 @@ def hyp_logistic_regression(x_train, y_train, x_test, num_iter=10):
     '''
         Perform Hyperparameter search for Logistic Regression model on train and
         validation sets, evaluate best estimator on test set.
+
+        Obs: It is usually not necessary to apply regularization on linear models,
+        rendering this search moot.
 
         Returns test set predictions
     '''
@@ -45,24 +49,23 @@ def hyp_logistic_regression(x_train, y_train, x_test, num_iter=10):
 
     return predictions
 
-def hyp_perceptron(x_train, y_train, x_test, num_iter=10):
+def hyp_knn(x_train, y_train, x_test):
     '''
-        Perform Hyperparameter search for Linear Perceptron model on train and
+        Perform Hyperparameter search for Nearest Neighbours classifier on train and
         validation sets, evaluate best estimator on test set.
 
         Returns test set predictions
     '''
     from scipy.stats             import expon
-    from sklearn.model_selection import RandomizedSearchCV
-    from sklearn.linear_model    import Perceptron
+    from sklearn.model_selection import GridSearchCV
+    from sklearn.neighbors       import KNeighborsClassifier
 
+    model = KNeighborsClassifier( n_neighbors=5, algorithm='ball_tree', weights='uniform',
+                                p=2, metric='minkowski', n_jobs=-1)
 
-    model = Perceptron(shuffle=True, class_weight=None, max_iter=1000, penalty='l2',
-                        alpha=1.0, tol=1e-3)
-
-    params = {'alpha': expon()}
-    hypModel = RandomizedSearchCV(model, params, n_iter=num_iter, scoring='f1', cv=10,
-                                n_jobs=-1, error_score='raise', verbose=0)
+    params = {'n_neighbors': list(range(2, 31, 2))}
+    hypModel = GridSearchCV(model, params, scoring='f1', cv=10, n_jobs=-1, error_score='raise',
+                            verbose=2)
 
     hypModel.fit(trainDf, y_train)
 
@@ -70,16 +73,18 @@ def hyp_perceptron(x_train, y_train, x_test, num_iter=10):
 
     predictions = hypModel.predict(testDf)
 
-    return predictions
+    return predictions, hypModel.cv_results_
 
 if __name__ == "__main__":
     print("\n\n---- Loading and Preprocessing ----")
 
-    dataDf, labels = load_dataset(dirs.dataset, randomState=defs.standardSample, fracPos=defs.fracPos, fracNeg=defs.fracNeg)#numPos=numPos, numNeg=numNeg)
+    dataDf, labels = load_dataset(dirs.dataset, randomState=defs.standardSample,
+                                    fracPos=defs.fracPos, fracNeg=defs.fracNeg)#numPos=numPos, numNeg=numNeg)
     dataDf = preproc(dataDf, verbose=False)
 
-    testSize = round(dataDf.shape[0]*0.2)
-    trainDf, testDf, y_train, y_test = train_test_split(dataDf, labels, test_size=testSize)
+    testSize = round(dataDf.shape[0]*defs.fracTest)
+    trainDf, testDf, y_train, y_test = train_test_split(dataDf, labels, test_size=testSize,
+                                                        random_state=defs.standardSample)
 
     print("\nTrain data loaded with following class distributions:")
     show_class_splits(y_train)
@@ -91,7 +96,12 @@ if __name__ == "__main__":
     # compactDf = dimension_reduction(dataDf, keepComp=60)
 
     print("\n\n---- Hyperparameter search ----\n")
-    # 
+    try:
+        os.makedirs(dirs.results)
+    except OSError:
+        pass
+
+    #
     # 'Logistic Regression with L2 Regularization'
     # # TODO: Testar LogisticRegressionCV, que encontra o C otimo
     # modelName = "Logistic Regression with L2 Regularization"
@@ -106,15 +116,19 @@ if __name__ == "__main__":
     # metricsLogRegTest = report_performance(y_test, bestPred, elapsed=elapsed, model_name=modelName)
     # print("")
     #
-    'Linear Perceptron'
-    modelName = "Linear Perceptron"
-    numIter = 10
-
+    'Nearest Neighbors'
+    modelName = "Nearest Neighbors"
     print("\n", modelName)
 
     start   = time.perf_counter()
-    bestPred = hyp_perceptron(trainDf, y_train, testDf, num_iter=10)
+    bestPred, cvResults = hyp_knn(trainDf, y_train, testDf)
     elapsed = time.perf_counter() - start
 
     metricsPercepTest = report_performance(y_test, bestPred, elapsed=elapsed, model_name=modelName)
+
+    cvResultsPath = dirs.results+modelName.replace(" ", "_")+"_cv_results"
+    bestPredPath  = dirs.results+modelName.replace(" ", "_")+"_best_pred"
+    np.save(cvResultsPath, cvResults)
+    np.save(bestPredPath,  bestPred)
+
     print("")

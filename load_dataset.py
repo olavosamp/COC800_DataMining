@@ -12,8 +12,8 @@ def load_dataset(path, fracPos=1.0, fracNeg=1.0, numPos=0, numNeg=0, randomState
     classNeg = pd.DataFrame(data[data.keys()[1]])
 
     print("\nOriginal data:")
-    print("Positive examples: {:6d}".format(classPos.shape[0]))
-    print("Negative examples: {:6d}".format(classNeg.shape[0]))
+    print("Positive examples: {:>9d}".format(classPos.shape[0]))
+    print("Negative examples: {:>9d}".format(classNeg.shape[0]))
 
     # Sample a fraction of the data
     # doing this before anything else avoids memory issues
