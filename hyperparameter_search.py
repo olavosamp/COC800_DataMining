@@ -138,28 +138,28 @@ if __name__ == "__main__":
     # metricsLogRegTest = report_performance(y_test, bestPred, elapsed=elapsed, model_name=modelName)
     # print("")
 
-    # 'Nearest Neighbors'
-    # modelName = "Nearest Neighbors"
-    # print("\n", modelName)
-    #
-    # start   = time.perf_counter()
-    # bestPred, cvResults = hyp_knn(trainDf, y_train, testDf)
-    # elapsed = time.perf_counter() - start
-    #
-    # metricsPercepTest = report_performance(y_test, bestPred, elapsed=elapsed, model_name=modelName)
-    #
-    # save_results(cvResults, bestPred, modelName)
-    # print("")
-
-    'Decision Tree'
-    modelName = "Decision Tree"
+    'Nearest Neighbors'
+    modelName = "Nearest Neighbors"
     print("\n", modelName)
-
+    
     start   = time.perf_counter()
-    bestPred, cvResults = hyp_decision_tree(trainDf, y_train, testDf)
+    bestPred, cvResults = hyp_knn(trainDf, y_train, testDf)
     elapsed = time.perf_counter() - start
-
+    
     metricsPercepTest = report_performance(y_test, bestPred, elapsed=elapsed, model_name=modelName)
-
+    
     save_results(cvResults, bestPred, modelName)
     print("")
+
+    #'Decision Tree'
+    #modelName = "Decision Tree"
+    #print("\n", modelName)
+#
+    #start   = time.perf_counter()
+    #bestPred, cvResults = hyp_decision_tree(trainDf, y_train, testDf)
+    #elapsed = time.perf_counter() - start
+
+    #metricsPercepTest = report_performance(y_test, bestPred, elapsed=elapsed, model_name=modelName)
+
+    #save_results(cvResults, bestPred, modelName)
+    #print("")
