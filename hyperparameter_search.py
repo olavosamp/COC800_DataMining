@@ -87,7 +87,7 @@ def hyp_decision_tree(x_train, y_train, x_test):
     classWeights = {defs.posCode: 0.5, defs.negCode: 0.5}
     model = DecisionTreeClassifier(class_weight="balanced", criterion='entropy', max_depth=15, min_samples_leaf=5)
 
-    params = {'max_depth': list(range(2, 31, 2))}
+    params = {'max_depth': list(range(2, 30, 1))}
     hypModel = GridSearchCV(model, params, scoring='f1', cv=10, n_jobs=4, error_score='raise',
                             verbose=2, return_train_score=True)
 

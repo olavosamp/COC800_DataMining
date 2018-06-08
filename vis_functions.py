@@ -3,7 +3,44 @@ import pandas               as pd
 import seaborn              as sns
 
 import matplotlib.pyplot    as plt
+import matplotlib           as mlp
 from mpl_toolkits.mplot3d   import Axes3D
+
+import defines              as defs
+
+mlp.rcParams['font.size'] = 20
+# print(mlp.rcParams.keys())
+# input()
+
+def plot_hyp(resultsDf, modelName):
+    import ast
+
+    params = list(ast.literal_eval(resultsDf.loc[0, 'params']).keys())
+
+    if len(params) == 1:
+        paramName = params[0]
+        x = resultsDf["param_"+paramName]
+        train = resultsDf["mean_train_score"]
+        test  = resultsDf["mean_test_score"]
+
+        trainStd = resultsDf["std_train_score"]
+        testStd  = resultsDf["std_test_score"]
+
+        plt.errorbar(x, train, yerr=trainStd,  fmt='.-', color='xkcd:tomato', markersize=8,
+                    markerfacecolor='xkcd:fire engine red', markeredgecolor='xkcd:tomato',
+                    ecolor="xkcd:grey green", label="Train Score")
+
+        plt.errorbar(x, test, yerr=testStd,  fmt='.-', color='xkcd:dark blue', markersize=8,
+                    markerfacecolor='xkcd:night blue', markeredgecolor='xkcd:dark blue',
+                    ecolor="xkcd:grey green", label="Val Score")
+        plt.legend(fontsize='small')
+
+        plt.title("{} parameter search: {}".format(modelName, paramName))
+        plt.xlabel(paramName)
+        plt.ylabel("F1 Score")
+
+        plt.show()
+    return defs.success
 
 def projection_plot(inputDf, labels):
     '''
@@ -137,7 +174,8 @@ def format_as_table(data,
                     header=None,
                     sort_by_key=None,
                     sort_order_reverse=False):
-    """Takes a list of dictionaries, formats the data, and returns
+    """
+    Takes a list of dictionaries, formats the data, and returns
     the formatted data as a text table.
 
     Required Parameters:
