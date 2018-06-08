@@ -62,9 +62,9 @@ def hyp_knn(x_train, y_train, x_test):
     model = KNeighborsClassifier( n_neighbors=5, algorithm='ball_tree', weights='uniform',
                                 p=2, metric='minkowski', n_jobs=-1)
 
-    params = {'n_neighbors': list(range(2, 31, 2))}
+    params = {'n_neighbors': list(range(3, 30, 1))}
     hypModel = GridSearchCV(model, params, scoring='f1', cv=10, n_jobs=-1, error_score='raise',
-                            verbose=2)
+                            verbose=2, return_train_score=True)
 
     hypModel.fit(trainDf, y_train)
 
@@ -141,25 +141,25 @@ if __name__ == "__main__":
     'Nearest Neighbors'
     modelName = "Nearest Neighbors"
     print("\n", modelName)
-    
+
     start   = time.perf_counter()
     bestPred, cvResults = hyp_knn(trainDf, y_train, testDf)
     elapsed = time.perf_counter() - start
-    
+
     metricsPercepTest = report_performance(y_test, bestPred, elapsed=elapsed, model_name=modelName)
-    
+
     save_results(cvResults, bestPred, modelName)
     print("")
 
-    #'Decision Tree'
-    #modelName = "Decision Tree"
-    #print("\n", modelName)
-#
-    #start   = time.perf_counter()
-    #bestPred, cvResults = hyp_decision_tree(trainDf, y_train, testDf)
-    #elapsed = time.perf_counter() - start
-
-    #metricsPercepTest = report_performance(y_test, bestPred, elapsed=elapsed, model_name=modelName)
-
-    #save_results(cvResults, bestPred, modelName)
-    #print("")
+    # 'Decision Tree'
+    # modelName = "Decision Tree"
+    # print("\n", modelName)
+    #
+    # start   = time.perf_counter()
+    # bestPred, cvResults = hyp_decision_tree(trainDf, y_train, testDf)
+    # elapsed = time.perf_counter() - start
+    #
+    # metricsPercepTest = report_performance(y_test, bestPred, elapsed=elapsed, model_name=modelName)
+    #
+    # save_results(cvResults, bestPred, modelName)
+    # print("")
