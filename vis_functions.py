@@ -7,13 +7,20 @@ import matplotlib           as mlp
 from mpl_toolkits.mplot3d   import Axes3D
 
 import defines              as defs
+import dirs
 
-mlp.rcParams['font.size'] = 20
+mlp.rcParams['font.size'] = 24
 # print(mlp.rcParams.keys())
 # input()
 
 def plot_hyp(resultsDf, modelName):
+    import os
     import ast
+
+    try:
+        os.makedirs(dirs.report)
+    except OSError:
+        pass
 
     params = list(ast.literal_eval(resultsDf.loc[0, 'params']).keys())
 
@@ -26,20 +33,32 @@ def plot_hyp(resultsDf, modelName):
         trainStd = resultsDf["std_train_score"]
         testStd  = resultsDf["std_test_score"]
 
+        fig = plt.figure(figsize=(28, 15))
+
+        # Plot train score
         plt.errorbar(x, train, yerr=trainStd,  fmt='.-', color='xkcd:tomato', markersize=8,
                     markerfacecolor='xkcd:fire engine red', markeredgecolor='xkcd:tomato',
                     ecolor="xkcd:grey green", label="Train Score")
 
+        # Plot test score
         plt.errorbar(x, test, yerr=testStd,  fmt='.-', color='xkcd:dark blue', markersize=8,
                     markerfacecolor='xkcd:night blue', markeredgecolor='xkcd:dark blue',
                     ecolor="xkcd:grey green", label="Val Score")
         plt.legend(fontsize='small')
 
+        plt.ylim(ymin=0.0, ymax=1.0)    # Should be adjusted for each search space
+        plt.xlim(xmin=x.min()-1, xmax=x.max()+1)       #
+
+        plt.subplots_adjust(left=0.09, bottom=0.09, right=0.95, top=0.80,
+                            wspace=None, hspace=None)
+
         plt.title("{} parameter search: {}".format(modelName, paramName))
         plt.xlabel(paramName)
-        plt.ylabel("F1 Score")
+        plt.ylabel("F1 Score", fontsize=28)
 
-        plt.show()
+        # plt.show()
+        fig.savefig(dirs.report+modelName+".pdf", orientation='portrait', bbox_inches='tight')
+        fig.savefig(dirs.report+modelName+".png", orientation='portrait', bbox_inches='tight')
     return defs.success
 
 def projection_plot(inputDf, labels):
