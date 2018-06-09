@@ -26,7 +26,9 @@ def plot_hyp(resultsDf, modelName):
 
     if len(params) == 1:
         paramName = params[0]
+
         x = resultsDf["param_"+paramName]
+
         train = resultsDf["mean_train_score"]
         test  = resultsDf["mean_test_score"]
 
@@ -44,10 +46,10 @@ def plot_hyp(resultsDf, modelName):
         plt.errorbar(x, test, yerr=testStd,  fmt='.-', color='xkcd:dark blue', markersize=8,
                     markerfacecolor='xkcd:night blue', markeredgecolor='xkcd:dark blue',
                     ecolor="xkcd:grey green", label="Val Score")
-        plt.legend(fontsize='small')
+        plt.legend(fontsize='small', loc='best')
 
-        plt.ylim(ymin=0.0, ymax=1.0)    # Should be adjusted for each search space
-        plt.xlim(xmin=x.min()-1, xmax=x.max()+1)       #
+        plt.ylim(ymin=0.0, ymax=1.0)             # Should be adjusted for each search space
+        plt.xlim(xmin=x.min()-1, xmax=x.max()+1) # as needed
 
         plt.subplots_adjust(left=0.09, bottom=0.09, right=0.95, top=0.80,
                             wspace=None, hspace=None)
@@ -57,6 +59,8 @@ def plot_hyp(resultsDf, modelName):
         plt.ylabel("F1 Score", fontsize=28)
 
         # plt.show()
+
+        # Save plots
         fig.savefig(dirs.report+modelName+".pdf", orientation='portrait', bbox_inches='tight')
         fig.savefig(dirs.report+modelName+".png", orientation='portrait', bbox_inches='tight')
     return defs.success

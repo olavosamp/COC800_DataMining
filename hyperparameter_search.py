@@ -99,6 +99,59 @@ def hyp_decision_tree(x_train, y_train, x_test):
 
     return predictions, hypModel.cv_results_
 
+def hyp_random_forest(x_train, y_train, x_test):
+    '''
+        Perform Hyperparameter search for Decision Tree on train and
+        validation sets, evaluate best estimator on test set.
+
+        Returns test set predictions
+    '''
+    from sklearn.model_selection import GridSearchCV
+    from sklearn.ensemble        import RandomForestClassifier
+
+
+    model = RandomForestClassifier(n_estimators=50, class_weight='balanced', criterion='entropy',
+                                    max_depth=15, min_samples_leaf=5, n_jobs=-1)
+
+    params = {'n_estimators': list(range(2, 80, 2))}
+    hypModel = GridSearchCV(model, params, scoring='f1', cv=10, n_jobs=4, error_score='raise',
+                            verbose=2, return_train_score=True)
+
+    hypModel.fit(trainDf, y_train)
+
+    print("\nBest parameters:", hypModel.best_params_)
+
+    predictions = hypModel.predict(testDf)
+
+    return predictions, hypModel.cv_results_
+
+def hyp_ada_boost(x_train, y_train, x_test):
+    '''
+        Perform Hyperparameter search for AdaBoost ensemble on train and
+        validation sets, evaluate best estimator on test set.
+
+        Returns test set predictions
+    '''
+    from sklearn.model_selection import GridSearchCV
+    from sklearn.ensemble        import AdaBoostClassifier
+
+    # tree = DecisionTreeClassifier(class_weight="balanced", criterion='entropy',
+    #                                         max_depth=15, min_samples_leaf=5)
+
+    model = AdaBoostClassifier(n_estimators=50, learning_rate=1.0)
+
+    params = {'n_estimators': list(range(2, 80, 2))}
+    hypModel = GridSearchCV(model, params, scoring='f1', cv=10, n_jobs=4, error_score='raise',
+                            verbose=2, return_train_score=True)
+
+    hypModel.fit(trainDf, y_train)
+
+    print("\nBest parameters:", hypModel.best_params_)
+
+    predictions = hypModel.predict(testDf)
+
+    return predictions, hypModel.cv_results_
+
 
 if __name__ == "__main__":
     print("\n\n---- Loading and Preprocessing ----")
@@ -135,22 +188,22 @@ if __name__ == "__main__":
     # bestPred = hyp_logistic_regression(trainDf, y_train, testDf, num_iter=10)
     # elapsed = time.perf_counter() - start
     #
-    # metricsLogRegTest = report_performance(y_test, bestPred, elapsed=elapsed, model_name=modelName)
+    # metricsTest = report_performance(y_test, bestPred, elapsed=elapsed, model_name=modelName)
     # print("")
 
-    'Nearest Neighbors'
-    modelName = "Nearest Neighbors"
-    print("\n", modelName)
-
-    start   = time.perf_counter()
-    bestPred, cvResults = hyp_knn(trainDf, y_train, testDf)
-    elapsed = time.perf_counter() - start
-
-    metricsPercepTest = report_performance(y_test, bestPred, elapsed=elapsed, model_name=modelName)
-
-    save_results(cvResults, bestPred, modelName)
-    print("")
-
+    # 'Nearest Neighbors'
+    # modelName = "Nearest Neighbors"
+    # print("\n", modelName)
+    #
+    # start   = time.perf_counter()
+    # bestPred, cvResults = hyp_knn(trainDf, y_train, testDf)
+    # elapsed = time.perf_counter() - start
+    #
+    # metricsPercepTest = report_performance(y_test, bestPred, elapsed=elapsed, model_name=modelName)
+    #
+    # save_results(cvResults, bestPred, modelName)
+    # print("")
+    #
     # 'Decision Tree'
     # modelName = "Decision Tree"
     # print("\n", modelName)
@@ -159,7 +212,35 @@ if __name__ == "__main__":
     # bestPred, cvResults = hyp_decision_tree(trainDf, y_train, testDf)
     # elapsed = time.perf_counter() - start
     #
-    # metricsPercepTest = report_performance(y_test, bestPred, elapsed=elapsed, model_name=modelName)
+    # metricsTest = report_performance(y_test, bestPred, elapsed=elapsed, model_name=modelName)
     #
     # save_results(cvResults, bestPred, modelName)
     # print("")
+
+    # 'Random Forest'
+    # modelName = "Random Forest"
+    # print("\n", modelName)
+    #
+    # start   = time.perf_counter()
+    # bestPred, cvResults = hyp_random_forest(trainDf, y_train, testDf)
+    # elapsed = time.perf_counter() - start
+    #
+    # metricsTest = report_performance(y_test, bestPred, elapsed=elapsed, model_name=modelName)
+    #
+    # resultsDf, _ = save_results(cvResults, bestPred, modelName)
+    # plot_hyp(resultsDf, modelName)
+    # print("")
+
+    'AdaBoost'
+    modelName = "AdaBoost"
+    print("\n", modelName)
+
+    start   = time.perf_counter()
+    bestPred, cvResults = hyp_ada_boost(trainDf, y_train, testDf)
+    elapsed = time.perf_counter() - start
+
+    metricsTest = report_performance(y_test, bestPred, elapsed=elapsed, model_name=modelName)
+
+    resultsDf, _ = save_results(cvResults, bestPred, modelName)
+    plot_hyp(resultsDf, modelName)
+    print("")

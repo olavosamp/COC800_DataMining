@@ -12,8 +12,10 @@ import defines              as defs
 from utils                  import load_results
 from vis_functions          import plot_hyp
 
-modelName = "Decision Tree"
+modelName = "AdaBoost"
+# modelName = "Decision Tree"
 # modelName = "Nearest Neighbors"
+# modelName = "Random Forest"
 cvResultsDf, predictions = load_results(modelName)
 
 plot_hyp(cvResultsDf, modelName)

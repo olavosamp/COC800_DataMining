@@ -59,7 +59,7 @@ def save_results(cvResults, predictions, modelName):
     resultsDf.to_csv(cvResultsPath)
     np.save(predPath,  predictions)
 
-    return defs.success
+    return resultsDf, predictions
 
 def load_results(modelName):
     import dirs
