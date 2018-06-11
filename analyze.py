@@ -10,7 +10,7 @@ import dirs
 import defines              as defs
 from load_dataset           import load_dataset
 from preproc                import preproc, dimension_reduction
-from utils                  import show_class_splits
+from utils                  import show_class_splits, report_performance
 
 from analysis_functions             import (gaussian_naive_bayes,
                                             log_reg, ridge_log_reg,
@@ -46,122 +46,102 @@ show_class_splits(y_test)
 print("\n\n---- Classification ----\n")
 
 'Bayesian Classifier'
-print("\nNaive Bayes")
+modelName = "Naive Bayes"
+
 start = time.perf_counter()
-bayesPred, _ = gaussian_naive_bayes(trainDf, y_train, testDf, y_test)
+predictions, _ = gaussian_naive_bayes(trainDf, y_train, testDf, y_test)
 elapsed = time.perf_counter() - start
-print("Elapsed: {:.2f}s".format(elapsed))
-# print("Correct predictions {:.4f}".format(np.sum(bayesPred == y_test)/testSize))
-print("Accuracy: {:.2f}".format(accuracy_score(y_test, bayesPred, normalize=True)))
-print("F1 Score: {:.2f}".format(f1_score(y_test, bayesPred)))
-print("AUC     : {:.2f}".format(roc_auc_score(y_test, bayesPred)))
+
+metrics, conf_matrix = report_performance(y_test, predictions, elapsed=elapsed, modelName=modelName, report=True)
+
 
 'Logistic Regression'
-print("\nLogistic Regression")
-start = time.perf_counter()
-logPred, _ = log_reg(trainDf, y_train, testDf, y_test)
-elapsed = time.perf_counter() - start
-print("Elapsed: {:.2f}s".format(elapsed))
-# print("Correct predictions {:.4f}".format(np.sum(logPred == y_test)/testSize))
-print("Accuracy: {:.2f}".format(accuracy_score(y_test, logPred, normalize=True)))
-print("F1 Score: {:.2f}".format(f1_score(y_test, logPred)))
-print("AUC     : {:.2f}".format(roc_auc_score(y_test, logPred)))
+modelName = "Logistic Regression"
+print("\n"+modelName)
 
-'Logistic Regression with L2 Regularization'
-# TODO: Testar LogisticRegressionCV, que encontra o C otimo
-logPenalty = 1/100
-
-print("\nLogistic Regression with L2 Regularization")
 start = time.perf_counter()
-rlogPred, _ = ridge_log_reg(trainDf, y_train, testDf, y_test, reg=logPenalty)
+predictions, _ = log_reg(trainDf, y_train, testDf, y_test)
 elapsed = time.perf_counter() - start
-print("Regularization paramenter (smaller is stronger): \n", logPenalty)
-print("Elapsed: {:.2f}s".format(elapsed))
-# print("Correct predictions {:.4f}".format(np.sum(rlogPred == y_test)/testSize))
-print("Accuracy: {:.2f}".format(accuracy_score(y_test, rlogPred, normalize=True)))
-print("F1 Score: {:.2f}".format(f1_score(y_test, rlogPred)))
-print("AUC     : {:.2f}".format(roc_auc_score(y_test, rlogPred)))
+
+metrics, conf_matrix = report_performance(y_test, predictions, elapsed=elapsed, modelName=modelName, report=True)
+
 
 'Linear Perceptron'
-print("\nLinear Perceptron")
-start = time.perf_counter()
-percepPred, _ = perceptron(trainDf, y_train, testDf, y_test)
-elapsed = time.perf_counter() - start
-print("Elapsed: {:.2f}s".format(elapsed))
-# print("Correct predictions {:.4f}".format(np.sum(logPred == y_test)/testSize))
-print("Accuracy: {:.2f}".format(accuracy_score(y_test, percepPred, normalize=True)))
-print("F1 Score: {:.2f}".format(f1_score(y_test, percepPred)))
-print("AUC     : {:.2f}".format(roc_auc_score(y_test, percepPred)))
+modelName = "Linear Perceptron"
+print("\n"+modelName)
 
-'Nearest Neighbours'
 start = time.perf_counter()
-knnPred, _ = nearest_neighbours(trainDf, y_train, testDf, y_test)
+predictions, _ = perceptron(trainDf, y_train, testDf, y_test)
 elapsed = time.perf_counter() - start
-print("\nNearest Neighbours")
-print("Elapsed: {:.2f}s".format(elapsed))
-# print("Correct predictions {:.4f}".format(np.sum(knnPred == y_test)/testSize))
-print("Accuracy: {:.2f}".format(accuracy_score(y_test, knnPred, normalize=True)))
-print("F1 Score: {:.2f}".format(f1_score(y_test, knnPred)))
-print("AUC     : {:.2f}".format(roc_auc_score(y_test, knnPred)))
 
-'Decision Tree'
-print("\nDecision Tree")
-start = time.perf_counter()
-treePred, _ = decision_tree(trainDf, y_train, testDf, y_test)
-elapsed = time.perf_counter() - start
-print("Elapsed: {:.2f}s".format(elapsed))
-# print("Correct predictions {:.4f}".format(np.sum(treePred == y_test)/testSize))
-print("Accuracy: {:.2f}".format(accuracy_score(y_test, treePred, normalize=True)))
-print("F1 Score: {:.2f}".format(f1_score(y_test, treePred)))
-print("AUC     : {:.2f}".format(roc_auc_score(y_test, treePred)))
+metrics, conf_matrix = report_performance(y_test, predictions, elapsed=elapsed, modelName=modelName, report=True)
 
-'Random Forest'
-print("\nRandom Forest")
-start = time.perf_counter()
-forestPred, _ = random_forest(trainDf, y_train, testDf, y_test)
-elapsed = time.perf_counter() - start
-print("Elapsed: {:.2f}s".format(elapsed))
-# print("Correct predictions {:.4f}".format(np.sum(forestPred == y_test)/testSize))
-print("Accuracy: {:.2f}".format(accuracy_score(y_test, forestPred, normalize=True)))
-print("F1 Score: {:.2f}".format(f1_score(y_test, forestPred)))
-print("AUC     : {:.2f}".format(roc_auc_score(y_test, forestPred)))
 
-'AdaBoost'
-print("\nAdaBoost")
-start = time.perf_counter()
-adaPred, _ = ada_boost(trainDf, y_train, testDf, y_test)
-elapsed = time.perf_counter() - start
-print("Elapsed: {:.2f}s".format(elapsed))
-# print("Correct predictions {:.4f}".format(np.sum(adaPred == y_test)/testSize))
-print("Accuracy: {:.2f}".format(accuracy_score(y_test, adaPred, normalize=True)))
-print("F1 Score: {:.2f}".format(f1_score(y_test, adaPred)))
-print("AUC     : {:.2f}".format(roc_auc_score(y_test, adaPred)))
+# 'Nearest Neighbours'
+# modelName = "Nearest Neighbors"
+# print("\n"+modelName)
+#
+# start = time.perf_counter()
+# predictions, _ = nearest_neighbours(trainDf, y_train, testDf, y_test)
+# elapsed = time.perf_counter() - start
+#
+# metrics = report_performance(y_test, predictions, elapsed=elapsed, modelName=modelName, report=True)
+#
+#
+# 'Decision Tree'
+# modelName = "Decision Tree"
+# print("\n"+modelName)
+#
+# start = time.perf_counter()
+# predictions, _ = decision_tree(trainDf, y_train, testDf, y_test)
+# elapsed = time.perf_counter() - start
+#
+# metrics = report_performance(y_test, predictions, elapsed=elapsed, modelName=modelName, report=True)
+#
+# 'Random Forest'
+# modelName = "Random Forest"
+# print("\n"+modelName)
+#
+# start = time.perf_counter()
+# predictions, _ = random_forest(trainDf, y_train, testDf, y_test)
+# elapsed = time.perf_counter() - start
+#
+# metrics = report_performance(y_test, predictions, elapsed=elapsed, modelName=modelName, report=True)
+#
+# 'AdaBoost'
+# modelName = "AdaBoost"
+# print("\n"+modelName)
+#
+# start = time.perf_counter()
+# predictions, _ = ada_boost(trainDf, y_train, testDf, y_test)
+# elapsed = time.perf_counter() - start
+#
+# metrics = report_performance(y_test, predictions, elapsed=elapsed, modelName=modelName, report=True)
+
 
 'Linear Discriminant Analysis'
-print("\nLinear Discriminant Analysis")
+modelName = "Linear Discriminant Analysis"
+print("\n"+modelName)
+
 start = time.perf_counter()
-ldaPred, _ = linear_discriminant_analysis(trainDf, y_train, testDf, y_test, n_components=None)
+predictions, _ = linear_discriminant_analysis(trainDf, y_train, testDf, y_test, n_components=None)
 elapsed = time.perf_counter() - start
-print("Elapsed: {:.2f}s".format(elapsed))
-# print("Correct predictions {:.4f}".format(np.sum(adaPred == y_test)/testSize))
-print("Accuracy: {:.2f}".format(accuracy_score(y_test, ldaPred, normalize=True)))
-print("F1 Score: {:.2f}".format(f1_score(y_test, ldaPred)))
-print("AUC     : {:.2f}".format(roc_auc_score(y_test, ldaPred)))
+
+metrics, conf_matrix = report_performance(y_test, predictions, elapsed=elapsed, modelName=modelName, report=True)
+
 
 'Quadratic Discriminant Analysis'
-print("\nQuadratic Discriminant Analysis")
+modelName = "Quadratic Discriminant Analysis"
+print("\n"+modelName)
+
 start = time.perf_counter()
-qdaPred, _ = linear_discriminant_analysis(trainDf, y_train, testDf, y_test)
+predictions, _ = linear_discriminant_analysis(trainDf, y_train, testDf, y_test)
 elapsed = time.perf_counter() - start
-print("Elapsed: {:.2f}s".format(elapsed))
-# print("Correct predictions {:.4f}".format(np.sum(adaPred == y_test)/testSize))
-print("Accuracy: {:.2f}".format(accuracy_score(y_test, qdaPred, normalize=True)))
-print("F1 Score: {:.2f}".format(f1_score(y_test, qdaPred)))
-print("AUC     : {:.2f}".format(roc_auc_score(y_test, qdaPred)))
+
+metrics, conf_matrix = report_performance(y_test, predictions, elapsed=elapsed, modelName=modelName, report=True)
 
 
 #   Regressão Polinomial (criação de novas features)
-
 
 # Rede neural MLP
 #

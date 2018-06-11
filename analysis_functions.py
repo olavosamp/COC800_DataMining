@@ -48,7 +48,7 @@ def gaussian_naive_bayes(dataDf, labels, testDf, testLabels):
     '''
     from sklearn.naive_bayes    import GaussianNB
 
-    gnb = GaussianNB()
+    gnb = GaussianNB(priors=None)
     gnb.fit(dataDf, labels)
 
     predictions = gnb.predict(testDf)
@@ -64,7 +64,7 @@ def decision_tree(x_train, y_train, x_test, y_test):
     from sklearn.tree           import DecisionTreeClassifier
 
     classWeights = {defs.posCode: 0.5, defs.negCode: 0.5}
-    tree = DecisionTreeClassifier(class_weight=classWeights, criterion='entropy', max_depth=15, min_samples_leaf=5)
+    tree = DecisionTreeClassifier(class_weight='balanced', criterion='entropy', max_depth=15, min_samples_leaf=5)
 
     tree.fit(x_train, y_train)
 
@@ -81,11 +81,9 @@ def random_forest(x_train, y_train, x_test, y_test):
     from sklearn.ensemble       import RandomForestClassifier
 
     classWeights = {defs.posCode: 0.5, defs.negCode: 0.5}
-    forest = RandomForestClassifier(n_estimators=50, class_weight=classWeights, criterion='gini', max_depth=15, min_samples_leaf=5, n_jobs=-1)
+    forest = RandomForestClassifier(n_estimators=50, class_weight='balanced', criterion='entropy', max_depth=15, min_samples_leaf=5, n_jobs=-1)
 
     forest.fit(x_train, y_train)
-
-    # print(np.sort(forest.feature_importances_))
 
     predictions = forest.predict(x_test)
 
@@ -98,13 +96,12 @@ def ada_boost(x_train, y_train, x_test, y_test):
         x_train, x_test: DataFrames of shape num_samples x num_features.
     '''
     from sklearn.ensemble       import AdaBoostClassifier
+    from sklearn.tree           import DecisionTreeClassifier
 
-    classWeights = {defs.posCode: 0.5, defs.negCode: 0.5}
-    ada = AdaBoostClassifier(n_estimators=50, learning_rate=1.0)
+    tree = DecisionTreeClassifier(class_weight='balanced', criterion='entropy', max_depth=15, min_samples_leaf=5)
+    ada = AdaBoostClassifier(base_estimator=tree, n_estimators=50, learning_rate=1.0)
 
     ada.fit(x_train, y_train)
-
-    # print(np.sort(forest.feature_importances_))
 
     predictions = ada.predict(x_test)
 
