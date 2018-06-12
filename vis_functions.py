@@ -70,6 +70,7 @@ def plot_hyp(resultsDf, modelName, save=True, show=False):
     except OSError:
         pass
 
+    # Convert the dict expressed in string form to dict object
     params = list(ast.literal_eval(resultsDf.loc[0, 'params']).keys())
 
     if len(params) == 1:

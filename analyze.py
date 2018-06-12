@@ -64,7 +64,7 @@ modelName = "Logistic Regression"
 print("\n"+modelName)
 
 start = time.perf_counter()
-predictions, _ = log_reg(trainDf, y_train, testDf, y_test)
+predictions, predTrain, _ = log_reg(trainDf, y_train, testDf, y_test)
 elapsed = time.perf_counter() - start
 
 metrics, conf_matrix = report_performance(y_test, predictions, elapsed=elapsed, modelName=modelName, report=True)

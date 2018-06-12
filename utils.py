@@ -4,7 +4,35 @@ import pandas       as pd
 import defines      as defs
 import dirs
 
+np.set_printoptions(precision=2)
 
+def sp_score(labels, predictions):
+    from sklearn.metrics    import confusion_matrix
+
+    vn, fp, fn, vp = confusion_matrix(labels, predictions).ravel()
+
+    S = vp/(vp + fn) # Recall
+    E = vn/(vn + fp) # Specificity
+
+    sp_score = np.sqrt(np.sqrt(S*E)*(S + E)/2)
+
+    return sp_score
+
+def get_best_thresh(labels, score, plot=False):
+    from sklearn.metrics    import roc_curve
+
+    fpr, tpr, thresholds = roc_curve(labels, score[:, 1], pos_label=defs.posCode, drop_intermediate=True)
+
+    spList = []
+    for thresh in thresholds:
+        # If sample has score >= threshold, it is classified as positive
+        predictions = np.where(score[:, 1] >= thresh, defs.posCode, defs.negCode)
+
+        spList.append(sp_score(labels, predictions))
+
+    bestThresh = thresholds[np.argmax(spList)]
+
+    return bestThresh
 
 def show_class_splits(labels):
     entriesPos = np.sum(labels == defs.posCode)
@@ -17,25 +45,12 @@ def show_class_splits(labels):
 
     return defs.success
 
-
-# def print_metrics(metricsDict):
-#     print(metricsDict)
-#     input()
-#     for key in metricsDict.columns:
-#         element = metricsDict[key]
-#         if isinstance(element, float):
-#             print("{:15}: {:.2f}".format(key, element))
-#         else:
-#             print("{:15}: {}".format(key, element))
-#
-#     return defs.success
-
 def print_metrics(metricsDict):
     for key in metricsDict.keys():
-        if isinstance(metricsDict[key], float):
-            print("{:15}: {:.2f}".format(key, metricsDict[key]))
+        if isinstance(metricsDict[key][0], float):
+            print("{:15}: {:.2f}".format(key, metricsDict[key][0]))
         else:
-            print("{:15}: {}".format(key, metricsDict[key]))
+            print("{:15}: {}".format(key, metricsDict[key][0]))
 
     return defs.success
 
@@ -77,11 +92,11 @@ def report_performance(labels, predictions, elapsed=0, modelName="", report=True
         filePath = dirs.report+"metrics_"+modelName+".xlsx"
         metricsDf.to_excel(filePath, index=False, float_format="%.2f")
 
-        # Save confusion matrix to Excel file
-        confDf = pd.DataFrame(conf_matrix, index=['True1', 'True2'], columns=['Predicted1', 'Predicted2'])
-
-        filePath = dirs.report+"conf_matrix_"+modelName+".xlsx"
-        confDf.to_excel(filePath, index=True)
+        # # Save confusion matrix to Excel file
+        # confDf = pd.DataFrame(conf_matrix, index=['True1', 'True2'], columns=['Predicted1', 'Predicted2'])
+        #
+        # filePath = dirs.report+"conf_matrix_"+modelName+".xlsx"
+        # confDf.to_excel(filePath, index=True)
 
 
     return metrics, conf_matrix
@@ -120,6 +135,7 @@ def load_results(modelName):
     predictions = np.load(predPath)
 
     return resultsDf, predictions
+
 
 # def get_class_weights(y):
 #     '''
