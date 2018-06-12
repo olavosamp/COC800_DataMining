@@ -10,10 +10,58 @@ import defines              as defs
 import dirs
 
 mlp.rcParams['font.size'] = 24
-# print(mlp.rcParams.keys())
-# input()
 
-def plot_hyp(resultsDf, modelName):
+def plot_conf_matrix(labels, predictions, modelName="", show=False, save=True, normalize=False):
+    import os
+    from sklearn.metrics    import confusion_matrix
+
+    if modelName == "":
+        modelName = "unnamed"
+
+    try:
+        os.makedirs(dirs.report)
+    except OSError:
+        pass
+
+    fig = plt.figure(figsize=(18,10))
+    confDf = pd.DataFrame(confusion_matrix(labels, predictions), index=['True E', 'True H'],
+                                            columns=['Pred. E', 'Pred. H'])
+
+    # Auto adjust colorbar limits
+    vmin = None
+    vmax = None
+    fmt = ''
+
+    if normalize is True:
+        modelName += " normalized"
+
+        # Normalize each row of conf matrix
+        confDf.iloc[0, :] = confDf.iloc[0, :]/confDf.iloc[0, :].sum()
+        confDf.iloc[1, :] = confDf.iloc[1, :]/confDf.iloc[1, :].sum()
+
+        # Set colorbar limits to range [0, 1]
+        vmin = 0.0
+        vmax = 1.0
+        fmt = '.2f'
+
+
+    ax = sns.heatmap(confDf, annot=True, cmap='Blues', vmin=vmin, vmax=vmax, square=True, fmt=fmt,
+                    annot_kws={'verticalalignment': 'center', 'horizontalalignment': 'center'})
+
+    plt.subplots_adjust(left=0.02, bottom=0.08, right=0.90, top=0.95,
+                        wspace=None, hspace=None)
+
+    plt.title("{}".format(modelName))
+
+    if show is True:
+        plt.show()
+
+    if save is True:
+        fig.savefig(dirs.report+"Conf_matrix_"+modelName.replace(" ", "_")+".png", orientation='portrait', bbox_inches='tight')
+
+    return ax
+
+def plot_hyp(resultsDf, modelName, save=True, show=False):
     import os
     import ast
 
@@ -58,17 +106,19 @@ def plot_hyp(resultsDf, modelName):
         plt.xlabel(paramName)
         plt.ylabel("F1 Score", fontsize=28)
 
-        # plt.show()
+        if show is True:
+            plt.show()
 
-        # Save plots
-        fig.savefig(dirs.report+modelName+".pdf", orientation='portrait', bbox_inches='tight')
-        fig.savefig(dirs.report+modelName+".png", orientation='portrait', bbox_inches='tight')
+        if save is True:
+            # Save plots
+            fig.savefig(dirs.report+"hyp_"+modelName.replace(" ", "_")+".pdf", orientation='portrait', bbox_inches='tight')
+            fig.savefig(dirs.report+"hyp_"+modelName.replace(" ", "_")+".png", orientation='portrait', bbox_inches='tight')
     return defs.success
 
 def projection_plot(inputDf, labels):
     '''
-    inputDf is an observations by features DataFrame
-    labels is an observations by 1 DataFrame of [+1, -1] labels
+        inputDf is an observations by features DataFrame
+        labels is an observations by 1 DataFrame of [+1, -1] labels
     '''
     features = inputDf.shape[1]
     # features = 10

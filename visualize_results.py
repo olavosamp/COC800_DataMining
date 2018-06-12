@@ -13,9 +13,17 @@ from utils                  import load_results
 from vis_functions          import plot_hyp
 
 modelName = "AdaBoost"
-# modelName = "Decision Tree"
-# modelName = "Nearest Neighbors"
-# modelName = "Random Forest"
 cvResultsDf, predictions = load_results(modelName)
+plot_hyp(cvResultsDf, modelName)
 
+modelName = "Decision Tree"
+cvResultsDf, predictions = load_results(modelName)
+plot_hyp(cvResultsDf, modelName)
+
+modelName = "Nearest Neighbors"
+cvResultsDf, predictions = load_results(modelName)
+plot_hyp(cvResultsDf, modelName)
+
+modelName = "Random Forest"
+cvResultsDf, predictions = load_results(modelName)
 plot_hyp(cvResultsDf, modelName)

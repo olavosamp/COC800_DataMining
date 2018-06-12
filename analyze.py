@@ -19,6 +19,8 @@ from analysis_functions             import (gaussian_naive_bayes,
                                             decision_tree, random_forest, ada_boost,
                                             linear_discriminant_analysis, quadratic_discriminant_analysis)
 
+from vis_functions                  import plot_conf_matrix
+
 # np.set_printoptions(precision=4)
 
 # numPos   = 20000   # Max of    63 981 samples
@@ -47,12 +49,14 @@ print("\n\n---- Classification ----\n")
 
 'Bayesian Classifier'
 modelName = "Naive Bayes"
+print("\n"+modelName)
 
 start = time.perf_counter()
 predictions, _ = gaussian_naive_bayes(trainDf, y_train, testDf, y_test)
 elapsed = time.perf_counter() - start
 
 metrics, conf_matrix = report_performance(y_test, predictions, elapsed=elapsed, modelName=modelName, report=True)
+fig = plot_conf_matrix(y_test, predictions, modelName=modelName)
 
 
 'Logistic Regression'
@@ -64,6 +68,7 @@ predictions, _ = log_reg(trainDf, y_train, testDf, y_test)
 elapsed = time.perf_counter() - start
 
 metrics, conf_matrix = report_performance(y_test, predictions, elapsed=elapsed, modelName=modelName, report=True)
+fig = plot_conf_matrix(y_test, predictions, modelName=modelName)
 
 
 'Linear Perceptron'
@@ -75,6 +80,7 @@ predictions, _ = perceptron(trainDf, y_train, testDf, y_test)
 elapsed = time.perf_counter() - start
 
 metrics, conf_matrix = report_performance(y_test, predictions, elapsed=elapsed, modelName=modelName, report=True)
+fig = plot_conf_matrix(y_test, predictions, modelName=modelName)
 
 
 # 'Nearest Neighbours'
@@ -128,6 +134,7 @@ predictions, _ = linear_discriminant_analysis(trainDf, y_train, testDf, y_test, 
 elapsed = time.perf_counter() - start
 
 metrics, conf_matrix = report_performance(y_test, predictions, elapsed=elapsed, modelName=modelName, report=True)
+fig = plot_conf_matrix(y_test, predictions, modelName=modelName)
 
 
 'Quadratic Discriminant Analysis'
@@ -139,7 +146,7 @@ predictions, _ = linear_discriminant_analysis(trainDf, y_train, testDf, y_test)
 elapsed = time.perf_counter() - start
 
 metrics, conf_matrix = report_performance(y_test, predictions, elapsed=elapsed, modelName=modelName, report=True)
-
+fig = plot_conf_matrix(y_test, predictions, modelName=modelName)
 
 #   Regressão Polinomial (criação de novas features)
 
