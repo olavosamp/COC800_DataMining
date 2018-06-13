@@ -1,6 +1,7 @@
 import numpy                as np
 import pandas               as pd
 import seaborn              as sns
+import os
 
 import matplotlib.pyplot    as plt
 import matplotlib           as mlp
@@ -11,7 +12,55 @@ import dirs
 
 mlp.rcParams['font.size'] = 24
 
-def plot_conf_matrix(labels, predictions, modelName="", show=False, save=True, normalize=False):
+def plot_roc_curve(labels, score, modelName="", show=False, save=True):
+    from sklearn.metrics    import roc_curve, f1_score
+    from utils              import sp_score
+
+    fig = plt.figure(figsize=(24, 18))
+
+    fpr, tpr, thresholds = roc_curve(labels, score[:, 1], pos_label=defs.posCode, drop_intermediate=True)
+
+    spList = []
+    for thresh in thresholds:
+        # If sample has score >= threshold, it is classified as positive
+        predictions = np.where(score[:, 1] >= thresh, defs.posCode, defs.negCode)
+
+        spList.append(sp_score(labels, predictions))    # Select based on SP score
+        # spList.append(f1_score(labels, predictions))    # Select based on F1 score (yields worse results, investigate why )
+
+    bestThresh = thresholds[np.argmax(spList)]
+
+    plt.plot(fpr, tpr, label='ROC', linewidth='4')
+    plt.plot([0, 1], [0, 1], color='navy', linestyle='--', label='Classificador aleatório')
+    plt.xlim([0.0, 1.0])
+    plt.ylim([0.0, 1.05])
+    plt.xlabel('Probabilidade de Falso Positivo',fontsize= 'large')
+    plt.ylabel('Probabilidade de Detecção',fontsize= 'large')
+    plt.title('Curva ROC '+modelName, fontsize= 'xx-large')
+    plt.legend(loc="lower right")
+
+    plt.subplots_adjust(left=0.09, bottom=0.09, right=0.95, top=0.80,
+                        wspace=None, hspace=None)
+
+
+    if show is True:
+        plt.show()
+
+    if save is True:
+        try:
+            os.makedirs(dirs.figures)
+        except OSError:
+            pass
+
+        fig.savefig(dirs.figures+"ROC_Curve_"+modelName.replace(" ", "_")+".pdf",
+                    orientation='portrait', bbox_inches='tight')
+        fig.savefig(dirs.figures+"ROC_Curve_"+modelName.replace(" ", "_")+".png",
+                    orientation='portrait', bbox_inches='tight')
+
+
+    return fig
+
+def plot_conf_matrix(labels, predictions, modelName="", show=False, save=True, normalize=True):
     import os
     from sklearn.metrics    import confusion_matrix
 
@@ -24,8 +73,8 @@ def plot_conf_matrix(labels, predictions, modelName="", show=False, save=True, n
         pass
 
     fig = plt.figure(figsize=(18,10))
-    confDf = pd.DataFrame(confusion_matrix(labels, predictions), index=['True E', 'True H'],
-                                            columns=['Pred. E', 'Pred. H'])
+    confDf = pd.DataFrame(confusion_matrix(labels, predictions, labels=[defs.posCode, defs.negCode]),
+                         index=['True H', 'True E'], columns=['Pred. H', 'Pred. E'])
 
     # Auto adjust colorbar limits
     vmin = None
@@ -62,6 +111,10 @@ def plot_conf_matrix(labels, predictions, modelName="", show=False, save=True, n
     return ax
 
 def plot_hyp(resultsDf, modelName, save=True, show=False):
+    '''
+        Plot hyperparameter search plots: F1 score as function of parameter variation.
+        Restricted to unidimensional search spaces (search over only one parameter).
+    '''
     import os
     import ast
 
@@ -116,16 +169,21 @@ def plot_hyp(resultsDf, modelName, save=True, show=False):
             fig.savefig(dirs.report+"hyp_"+modelName.replace(" ", "_")+".png", orientation='portrait', bbox_inches='tight')
     return defs.success
 
-def projection_plot(inputDf, labels):
+def projection_plot(inputDf, labels, save=True, show=False):
     '''
         inputDf is an observations by features DataFrame
         labels is an observations by 1 DataFrame of [+1, -1] labels
     '''
+    try:
+        os.makedirs(dirs.figures)
+    except OSError:
+        pass
+
     features = inputDf.shape[1]
     # features = 10
 
-    posData = inputDf[labels == +1]  # Last DataFrame columns are labels:
-    negData = inputDf[labels == -1]  # used to filter data by class
+    posData = inputDf[labels == defs.posCode]  # Last DataFrame columns are labels:
+    negData = inputDf[labels == defs.negCode]  # used to filter data by class
 
     fig, axs = plt.subplots(nrows=features, ncols=features, figsize=(12,10))#, squeeze=False, tight_layout=True)
 
@@ -155,29 +213,71 @@ def projection_plot(inputDf, labels):
                 axs[row,col].set_xlabel("X{}".format(col))
                 axs[row,col].get_xaxis().set_visible(True)
 
-    plt.show()
+    # plt.title("Projection Plot of {}".format(features))
+    plt.subplots_adjust(left=0.09, bottom=0.09, right=0.95, top=0.80,
+                        wspace=None, hspace=None)
+
+    fig.set_size_inches(20, 20)
+
+    if show is True:
+        plt.show()
+
+    if save is True:
+        # Save plots
+        fig.savefig(dirs.figures+"Projection_Plot_{}_features".format(features)+".pdf",
+                    orientation='portrait', bbox_inches='tight')
+        fig.savefig(dirs.figures+"Projection_Plot_{}_features".format(features)+".png",
+                    orientation='portrait', bbox_inches='tight')
+
     return axs, fig
 
 
-def plot_boxplot(inputDf, labels):
-    # posClass = dataDf.loc[dataDf.iloc[:, -1] == +1]
-    # negClass = dataDf.loc[dataDf.iloc[:, -1] == -1]
+def plot_boxplot(inputDf, labels, save=True, show=False):
+    '''
+        Plot Boxplot
+    '''
+    try:
+        os.makedirs(dirs.figures)
+    except OSError:
+        pass
 
-    # ax = sns.boxplot(x='Variables', y='Values', data=dataDf.loc[:, -1].values)
     dataDf = pd.concat([inputDf, pd.DataFrame(labels, columns=['labels'])])
 
+    # Boxplot
     ax = sns.boxplot(data=inputDf)
-    ax.set_title("Boxplot of {} features".format(inputDf.shape[1]))
-    plt.show()
 
-    # Unusable, scales very badly with large number of observations
-    # ax = sns.swarmplot(data=inputDf)
-    # ax.set_title("Swarmplot of {} features".format(inputDf.shape[1]))
-    plt.show()
+    ax.set_title("Boxplot of {} features".format(inputDf.shape[1]))
+
+    fig = plt.gcf()
+
+    # ax.tick_params(axis='x', labelsize='x-small')
+    ax.set_ylim(top=100)
+    ax.get_xaxis().set_visible(False)
+
+    fig.set_size_inches(28, 15)
+    plt.subplots_adjust(left=0.09, bottom=0.09, right=0.95, top=0.80,
+    wspace=None, hspace=None)
+
+    if show is True:
+        plt.show()
+
+    if save is True:
+        # Save plots
+        fig.savefig(dirs.figures+"Boxplot"+".pdf", orientation='portrait', bbox_inches='tight')
+        fig.savefig(dirs.figures+"Boxplot"+".png", orientation='portrait', bbox_inches='tight')
+
     return ax
 
 
-def eigen_plot(inputDf, labels):
+def eigen_plot(inputDf, labels, save=True, show=False):
+    '''
+        Plot cumulative components cumulative and individual contribution to signal energy.
+    '''
+    try:
+        os.makedirs(dirs.figures)
+    except OSError:
+        pass
+
     # Get Principal Components ratio
     eignVals =  np.linalg.svd(inputDf, compute_uv=False)
     eignVals = eignVals/eignVals.sum()
@@ -203,30 +303,69 @@ def eigen_plot(inputDf, labels):
     ax.set_ylim(bottom=0.0, top=1.0)
     ax.get_xaxis().set_visible(False)
 
-    plt.show()
+    fig = plt.gcf()
+    fig.set_size_inches(25, 15)
+    plt.subplots_adjust(left=0.09, bottom=0.09, right=0.95, top=0.80,
+    wspace=None, hspace=None)
+
+    if show is True:
+        plt.show()
+
+    if save is True:
+        # Save plots
+        plt.savefig(dirs.figures+"Principal_components"+".pdf", orientation='portrait', bbox_inches='tight')
+        plt.savefig(dirs.figures+"Principal_components"+".png", orientation='portrait', bbox_inches='tight')
     return ax
 
 
-def plot_3d(compactDf, labels):
+def plot_3d(compactDf, labels, save=True, show=False):
+    '''
+        Plot projection of first 3 principal components in a 3D plot.
+    '''
+    try:
+        os.makedirs(dirs.figures)
+    except OSError:
+        pass
+
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
 
-    posData = compactDf[labels == +1]
-    negData = compactDf[labels == -1]
+    posData = compactDf[labels == defs.posCode]
+    negData = compactDf[labels == defs.negCode]
 
     ax.scatter(posData.iloc[:, 0], posData.iloc[:, 1], posData.iloc[:, 2], c='xkcd:fire engine red', alpha=0.3)
     ax.scatter(negData.iloc[:, 0], negData.iloc[:, 1], negData.iloc[:, 2], c='xkcd:twilight blue', alpha=0.3)
 
     ax.set_title("3D Scatter Plot")
-    plt.show()
+
+    fig = plt.gcf()
+    fig.set_size_inches(28, 28)
+    plt.subplots_adjust(left=0.09, bottom=0.09, right=0.95, top=0.80,
+    wspace=None, hspace=None)
+
+    if show is True:
+        plt.show()
+
+    if save is True:
+        # Save plots
+        fig.savefig(dirs.figures+"Plot_3D"+".pdf", orientation='portrait', bbox_inches='tight')
+        fig.savefig(dirs.figures+"Plot_3D"+".png", orientation='portrait', bbox_inches='tight')
+
     return fig, ax
 
 
-def corr_matrix_plot(inputDf):
+def corr_matrix_plot(inputDf, save=True, show=False):
     '''
-    inputDf is an observations by features DataFrame
+        inputDf is an observations by features DataFrame
     '''
+    try:
+        os.makedirs(dirs.figures)
+    except OSError:
+        pass
+
+
     corr = inputDf.corr()
+    print("Correlation 1x1: ", corr[0,0])
 
     # Set up the matplotlib figure
     fig, ax = plt.subplots(figsize=(13, 11))
@@ -238,7 +377,23 @@ def corr_matrix_plot(inputDf):
     ax.set_title("Correlation plot of {} features".format(len(corr)))
     ax.get_xaxis().set_visible(False)
     ax.get_yaxis().set_visible(False)
-    plt.show()
+
+    fig = plt.gcf()
+    fig.set_size_inches(25, 25)
+    plt.subplots_adjust(left=0.09, bottom=0.09, right=0.95, top=0.80,
+    wspace=None, hspace=None)
+
+
+    if show is True:
+        plt.show()
+
+    if save is True:
+        # Save plots
+        fig.savefig(dirs.figures+"Correlation_Matrix_{}_features".format(len(corr))+".pdf",
+                    orientation='portrait', bbox_inches='tight')
+        fig.savefig(dirs.figures+"Correlation_Matrix_{}_features".format(len(corr))+".png",
+                    orientation='portrait', bbox_inches='tight')
+
     return fig, ax
 
 from operator import itemgetter

@@ -18,8 +18,9 @@ def sp_score(labels, predictions):
 
     return sp_score
 
+
 def get_best_thresh(labels, score, plot=False):
-    from sklearn.metrics    import roc_curve
+    from sklearn.metrics    import roc_curve, f1_score
 
     fpr, tpr, thresholds = roc_curve(labels, score[:, 1], pos_label=defs.posCode, drop_intermediate=True)
 
@@ -28,11 +29,14 @@ def get_best_thresh(labels, score, plot=False):
         # If sample has score >= threshold, it is classified as positive
         predictions = np.where(score[:, 1] >= thresh, defs.posCode, defs.negCode)
 
-        spList.append(sp_score(labels, predictions))
+        spList.append(sp_score(labels, predictions))    # Select based on SP score
+        # spList.append(f1_score(labels, predictions))    # Select based on F1 score (yields worse results, investigate why )
 
     bestThresh = thresholds[np.argmax(spList)]
+    print("\nThreshold: {:.2f}".format(bestThresh))
 
     return bestThresh
+
 
 def show_class_splits(labels):
     entriesPos = np.sum(labels == defs.posCode)
@@ -44,6 +48,7 @@ def show_class_splits(labels):
     print("Total:          {} entries".format(total))
 
     return defs.success
+
 
 def print_metrics(metricsDict):
     for key in metricsDict.keys():
@@ -84,13 +89,13 @@ def report_performance(labels, predictions, elapsed=0, modelName="", report=True
         print("\nConfusion Matrix:")
         print(conf_matrix)
 
-    if save is True:
-        modelName = modelName.replace(" ", "_")
-        # Save metrics to Excel file
-        metricsDf = pd.DataFrame.from_dict(metrics, orient='columns')
-
-        filePath = dirs.report+"metrics_"+modelName+".xlsx"
-        metricsDf.to_excel(filePath, index=False, float_format="%.2f")
+    # if save is True:
+        # modelName = modelName.replace(" ", "_")
+        # # Save metrics to Excel file
+        # metricsDf = pd.DataFrame.from_dict(metrics, orient='columns')
+        #
+        # filePath = dirs.report+"metrics_"+modelName+".xlsx"
+        # metricsDf.to_excel(filePath, index=False, float_format="%.2f")
 
         # # Save confusion matrix to Excel file
         # confDf = pd.DataFrame(conf_matrix, index=['True1', 'True2'], columns=['Predicted1', 'Predicted2'])
@@ -100,6 +105,32 @@ def report_performance(labels, predictions, elapsed=0, modelName="", report=True
 
 
     return metrics, conf_matrix
+
+
+def save_excel(metricsTest, metricsTrain):
+    import os
+
+    try:
+        os.makedirs(dirs.report)
+    except OSError:
+        pass
+
+    modelName = metricsTest["Model"][0].replace(" ", "_")#.split("_")[:-1]
+
+    # Create DataFrame with train and test metrics
+    df = pd.DataFrame( [[metricsTrain['f1'][0], metricsTest['f1'][0] ],
+                        [metricsTrain['auc'][0], metricsTest['auc'][0] ],
+                        [metricsTrain['precision'][0], metricsTest['precision'][0] ],
+                        [metricsTrain['recall'][0], metricsTest['recall'][0] ],
+                        [metricsTrain['accuracy'][0], metricsTest['accuracy'][0] ]],
+                        columns=['Treino', 'Teste'], index=['F1', 'AUC', 'Precisão', 'Recall', 'Acc'])
+
+
+    # Save metrics to Excel file
+    filePath = dirs.report+"metrics_"+modelName+".xlsx"
+    df.to_excel(filePath, index=True, float_format="%.2f")
+
+    return defs.success
 
 
 def save_results(cvResults, predictions, modelName):
