@@ -33,7 +33,7 @@ def plot_roc_curve(labels, score, modelName="", show=False, save=True):
     plt.plot(fpr, tpr, label='ROC', linewidth='4')
     plt.plot([0, 1], [0, 1], color='navy', linestyle='--', label='Classificador aleatório')
     plt.xlim([0.0, 1.0])
-    plt.ylim([0.0, 1.05])
+    plt.ylim([0.0, 1.01])
     plt.xlabel('Probabilidade de Falso Positivo',fontsize= 'large')
     plt.ylabel('Probabilidade de Detecção',fontsize= 'large')
     plt.title('Curva ROC '+modelName, fontsize= 'xx-large')
@@ -72,35 +72,44 @@ def plot_conf_matrix(labels, predictions, modelName="", show=False, save=True, n
     except OSError:
         pass
 
-    fig = plt.figure(figsize=(18,10))
+    fig, axs = plt.subplots(nrows=1, ncols=2, figsize=(15,10))
     confDf = pd.DataFrame(confusion_matrix(labels, predictions, labels=[defs.posCode, defs.negCode]),
                          index=['True H', 'True E'], columns=['Pred. H', 'Pred. E'])
 
+    ## Plot confusion matrix
     # Auto adjust colorbar limits
     vmin = None
     vmax = None
     fmt = ''
 
-    if normalize is True:
-        modelName += " normalized"
-
-        # Normalize each row of conf matrix
-        confDf.iloc[0, :] = confDf.iloc[0, :]/confDf.iloc[0, :].sum()
-        confDf.iloc[1, :] = confDf.iloc[1, :]/confDf.iloc[1, :].sum()
-
-        # Set colorbar limits to range [0, 1]
-        vmin = 0.0
-        vmax = 1.0
-        fmt = '.2f'
+    axs[0].set_title("Matriz de Confusão")
+    ax = sns.heatmap(confDf, ax=axs[0], annot=True, cmap='Blues', vmin=vmin, vmax=vmax, square=True, cbar=False,
+                    fmt=fmt, annot_kws={'verticalalignment': 'center', 'horizontalalignment': 'center'})
 
 
-    ax = sns.heatmap(confDf, annot=True, cmap='Blues', vmin=vmin, vmax=vmax, square=True, fmt=fmt,
-                    annot_kws={'verticalalignment': 'center', 'horizontalalignment': 'center'})
+    # Set up border labels
+
+    ## Plot normalized confusion matrix
+
+    # Normalize each row of conf matrix
+    confDf.iloc[0, :] = confDf.iloc[0, :]/confDf.iloc[0, :].sum()
+    confDf.iloc[1, :] = confDf.iloc[1, :]/confDf.iloc[1, :].sum()
+
+    # Set colorbar limits to range [0, 1]
+    vmin = 0.0
+    vmax = 1.0
+    fmt = '.2f'
+
+    axs[1].set_title("Normalizada")
+    ax = sns.heatmap(confDf, ax=axs[1], annot=True, cmap='Blues', vmin=vmin, vmax=vmax, square=True, cbar=False,
+                    fmt=fmt, annot_kws={'verticalalignment': 'center', 'horizontalalignment': 'center'})
+
+    axs[1].get_yaxis().set_visible(False)
+
 
     plt.subplots_adjust(left=0.02, bottom=0.08, right=0.90, top=0.95,
                         wspace=None, hspace=None)
-
-    plt.title("{}".format(modelName))
+    plt.suptitle("{}".format(modelName))
 
     if show is True:
         plt.show()

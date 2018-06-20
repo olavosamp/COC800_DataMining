@@ -21,181 +21,172 @@ from analysis_functions             import (gaussian_naive_bayes,
 
 from vis_functions                  import plot_conf_matrix
 
-# np.set_printoptions(precision=4)
+if __name__ == "__main__":
 
-# numPos   = 20000   # Max of    63 981 samples
-# numNeg   = 20000   # Max of 1 245 005 samples
+    # np.set_printoptions(precision=4)
 
-print("\n\n---- Loading and Preprocessing ----")
+    # numPos   = 20000   # Max of    63 981 samples
+    # numNeg   = 20000   # Max of 1 245 005 samples
 
-dataDf, labels = load_dataset(dirs.dataset, randomState=defs.standardSample,
-                                fracPos=defs.fracPos, fracNeg=defs.fracNeg)
-dataDf = preproc(dataDf, verbose=False)
+    print("\n\n---- Loading and Preprocessing ----")
 
-testSize = round(dataDf.shape[0]*defs.fracTest)
-trainDf, testDf, y_train, y_test = train_test_split(dataDf, labels, test_size=testSize,
-                                                    random_state=defs.standardSample)
+    dataDf, labels = load_dataset(dirs.dataset, randomState=defs.standardSample,
+                                    fracPos=defs.fracPos, fracNeg=defs.fracNeg)
+    dataDf = preproc(dataDf, verbose=False)
 
-print("\nTrain data loaded with following class distributions:")
-show_class_splits(y_train)
-print("\nTest data loaded with following class distributions:")
-show_class_splits(y_test)
+    testSize = round(dataDf.shape[0]*defs.fracTest)
+    trainDf, testDf, y_train, y_test = train_test_split(dataDf, labels, test_size=testSize,
+                                                        random_state=defs.standardSample)
 
-# 'Principal Components Analysis'
-# '   useful to reduce dataset dimensionality'
-# compactDf = dimension_reduction(dataDf, keepComp=60)
+    print("\nTrain data loaded with following class distributions:")
+    show_class_splits(y_train)
+    print("\nTest data loaded with following class distributions:")
+    show_class_splits(y_test)
 
-print("\n\n---- Classification ----\n")
+    # 'Principal Components Analysis'
+    # '   useful to reduce dataset dimensionality'
+    # compactDf = dimension_reduction(dataDf, keepComp=60)
 
-'Naive Bayes'
-modelName = "Naive Bayes"
-print("\n"+modelName)
-
-start = time.perf_counter()
-predictions, predTrain, _ = gaussian_naive_bayes(trainDf, y_train, testDf, y_test)
-elapsed = time.perf_counter() - start
-
-metricsTest, conf_matrix = report_performance(y_test, predictions, elapsed=elapsed, modelName=modelName, report=True)
-metricsTrain, conf_matrix = report_performance(y_train, predTrain, elapsed=elapsed, modelName=modelName+'_train', report=False)
-
-fig = plot_conf_matrix(y_test, predictions, modelName=modelName)
-fig = plot_conf_matrix(y_train, predTrain, modelName=modelName+'_train')
-
-save_excel(metricsTest, metricsTrain)
-
-
-'Logistic Regression'
-modelName = "Logistic Regression"
-print("\n"+modelName)
-
-start = time.perf_counter()
-predictions, predTrain, _ = log_reg(trainDf, y_train, testDf, y_test)
-
-elapsed = time.perf_counter() - start
-
-metricsTest, conf_matrix = report_performance(y_test, predictions, elapsed=elapsed, modelName=modelName, report=True)
-metricsTrain, conf_matrix = report_performance(y_train, predTrain, elapsed=elapsed, modelName=modelName+'_train', report=False)
-
-fig = plot_conf_matrix(y_test, predictions, modelName=modelName)
-fig = plot_conf_matrix(y_train, predTrain, modelName=modelName+'_train')
-
-save_excel(metricsTest, metricsTrain)
+    print("\n\n---- Classification ----\n")
+    #
+    # 'Naive Bayes'
+    # modelName = "Naive Bayes"
+    # print("\n"+modelName)
+    #
+    # start = time.perf_counter()
+    # predictions, metricsCV, _ = gaussian_naive_bayes(trainDf, y_train, testDf, y_test)
+    # elapsed = time.perf_counter() - start
+    #
+    # metricsTest, conf_matrix = report_performance(y_test, predictions, elapsed=elapsed, modelName=modelName, report=True)
+    # # metricsCV, conf_matrix = report_performance(y_train, predTrain, elapsed=elapsed, modelName=modelName+'_train', report=False)
+    #
+    # # fig = plot_conf_matrix(y_test, predictions, modelName=modelName)
+    # # fig = plot_conf_matrix(y_train, predTrain, modelName=modelName+'_train')
+    #
+    # # save_excel(metricsTest, metricsCV)
+    #
+    # print(metricsCV)
 
 
-'Linear Perceptron'
-modelName = "Linear Perceptron"
-print("\n"+modelName)
+    'Logistic Regression'
+    modelName = "Logistic Regression"
+    print("\n"+modelName)
 
-start = time.perf_counter()
-predictions, predTrain, _ = perceptron(trainDf, y_train, testDf, y_test)
-elapsed = time.perf_counter() - start
+    start = time.perf_counter()
+    predictions, metricsCV, _ = log_reg(trainDf, y_train, testDf, y_test)
 
-metricsTest, conf_matrix = report_performance(y_test, predictions, elapsed=elapsed, modelName=modelName, report=True)
-metricsTrain, conf_matrix = report_performance(y_train, predTrain, elapsed=elapsed, modelName=modelName+'_train', report=False)
+    elapsed = time.perf_counter() - start
 
-fig = plot_conf_matrix(y_test, predictions, modelName=modelName)
-fig = plot_conf_matrix(y_train, predTrain, modelName=modelName+'_train')
+    metricsTest, conf_matrix = report_performance(y_test, predictions, elapsed=elapsed, modelName=modelName, report=True)
 
-save_excel(metricsTest, metricsTrain)
+    fig = plot_conf_matrix(y_test, predictions, modelName=modelName)
+    # fig = plot_conf_matrix(y_train, predTrain, modelName=modelName+'_train')
 
-
-'Nearest Neighbours'
-modelName = "Nearest Neighbors"
-print("\n"+modelName)
-
-start = time.perf_counter()
-predictions, predTrain, _ = nearest_neighbours(trainDf, y_train, testDf, y_test)
-elapsed = time.perf_counter() - start
-
-metricsTest, _ = report_performance(y_test, predictions, elapsed=elapsed, modelName=modelName, report=True)
-metricsTrain, conf_matrix = report_performance(y_train, predTrain, elapsed=elapsed, modelName=modelName+'_train', report=False)
-
-fig = plot_conf_matrix(y_test, predictions, modelName=modelName)
-fig = plot_conf_matrix(y_train, predTrain, modelName=modelName+'_train')
-
-save_excel(metricsTest, metricsTrain)
+    save_excel(metricsTest, metricsCV)
 
 
-'Linear Discriminant Analysis'
-modelName = "Linear Discriminant Analysis"
-print("\n"+modelName)
 
-start = time.perf_counter()
-predictions, predTrain, _ = linear_discriminant_analysis(trainDf, y_train, testDf, y_test, n_components=None)
-elapsed = time.perf_counter() - start
+    'Linear Perceptron'
+    modelName = "Linear Perceptron"
+    print("\n"+modelName)
 
-metricsTest, conf_matrix = report_performance(y_test, predictions, elapsed=elapsed, modelName=modelName, report=True)
-metricsTrain, conf_matrix = report_performance(y_train, predTrain, elapsed=elapsed, modelName=modelName+'_train', report=False)
+    start = time.perf_counter()
+    predictions, predTrain, _ = perceptron(trainDf, y_train, testDf, y_test)
+    elapsed = time.perf_counter() - start
 
-fig = plot_conf_matrix(y_test, predictions, modelName=modelName)
-fig = plot_conf_matrix(y_train, predTrain, modelName=modelName+'_train')
+    metricsTest, conf_matrix = report_performance(y_test, predictions, elapsed=elapsed, modelName=modelName, report=True)
+    # metricsCV, conf_matrix = report_performance(y_train, predTrain, elapsed=elapsed, modelName=modelName+'_train', report=False)
 
-save_excel(metricsTest, metricsTrain)
+    fig = plot_conf_matrix(y_test, predictions, modelName=modelName)
 
-
-'Quadratic Discriminant Analysis'
-modelName = "Quadratic Discriminant Analysis"
-print("\n"+modelName)
-
-start = time.perf_counter()
-predictions, predTrain, _ = linear_discriminant_analysis(trainDf, y_train, testDf, y_test)
-elapsed = time.perf_counter() - start
-
-metricsTest, conf_matrix = report_performance(y_test, predictions, elapsed=elapsed, modelName=modelName, report=True)
-metricsTrain, conf_matrix = report_performance(y_train, predTrain, elapsed=elapsed, modelName=modelName+'_train', report=False)
-
-fig = plot_conf_matrix(y_test, predictions, modelName=modelName)
-fig = plot_conf_matrix(y_train, predTrain, modelName=modelName+'_train')
-
-save_excel(metricsTest, metricsTrain)
+    save_excel(metricsTest, metricsCV)
 
 
-'Decision Tree'
-modelName = "Decision Tree"
-print("\n"+modelName)
+    'Nearest Neighbours'
+    modelName = "Nearest Neighbors"
+    print("\n"+modelName)
 
-start = time.perf_counter()
-predictions, predTrain, _ = decision_tree(trainDf, y_train, testDf, y_test)
-elapsed = time.perf_counter() - start
+    start = time.perf_counter()
+    predictions, predTrain, _ = nearest_neighbours(trainDf, y_train, testDf, y_test)
+    elapsed = time.perf_counter() - start
 
-metricsTest, _ = report_performance(y_test, predictions, elapsed=elapsed, modelName=modelName, report=True)
-metricsTrain, conf_matrix = report_performance(y_train, predTrain, elapsed=elapsed, modelName=modelName+'_train', report=False)
+    metricsTest, conf_matrix = report_performance(y_test, predictions, elapsed=elapsed, modelName=modelName, report=True)
 
-fig = plot_conf_matrix(y_test, predictions, modelName=modelName)
-fig = plot_conf_matrix(y_train, predTrain, modelName=modelName+'_train')
+    fig = plot_conf_matrix(y_test, predictions, modelName=modelName)
 
-save_excel(metricsTest, metricsTrain)
+    save_excel(metricsTest, metricsCV)
 
 
-'Random Forest'
-modelName = "Random Forest"
-print("\n"+modelName)
+    'Linear Discriminant Analysis'
+    modelName = "Linear Discriminant Analysis"
+    print("\n"+modelName)
 
-start = time.perf_counter()
-predictions, predTrain, _ = random_forest(trainDf, y_train, testDf, y_test)
-elapsed = time.perf_counter() - start
+    start = time.perf_counter()
+    predictions, predTrain, _ = linear_discriminant_analysis(trainDf, y_train, testDf, y_test, n_components=None)
+    elapsed = time.perf_counter() - start
 
-metricsTest, _ = report_performance(y_test, predictions, elapsed=elapsed, modelName=modelName, report=True)
-metricsTrain, conf_matrix = report_performance(y_train, predTrain, elapsed=elapsed, modelName=modelName+'_train', report=False)
+    metricsTest, conf_matrix = report_performance(y_test, predictions, elapsed=elapsed, modelName=modelName, report=True)
 
-fig = plot_conf_matrix(y_test, predictions, modelName=modelName)
-fig = plot_conf_matrix(y_train, predTrain, modelName=modelName+'_train')
+    fig = plot_conf_matrix(y_test, predictions, modelName=modelName)
 
-save_excel(metricsTest, metricsTrain)
+    save_excel(metricsTest, metricsCV)
 
 
-'AdaBoost'
-modelName = "AdaBoost"
-print("\n"+modelName)
+    'Quadratic Discriminant Analysis'
+    modelName = "Quadratic Discriminant Analysis"
+    print("\n"+modelName)
 
-start = time.perf_counter()
-predictions, predTrain, _ = ada_boost(trainDf, y_train, testDf, y_test)
-elapsed = time.perf_counter() - start
+    start = time.perf_counter()
+    predictions, predTrain, _ = linear_discriminant_analysis(trainDf, y_train, testDf, y_test)
+    elapsed = time.perf_counter() - start
 
-metricsTest, confMatrix = report_performance(y_test, predictions, elapsed=elapsed, modelName=modelName, report=True)
-metricsTrain, conf_matrix = report_performance(y_train, predTrain, elapsed=elapsed, modelName=modelName+'_train', report=False)
+    metricsTest, conf_matrix = report_performance(y_test, predictions, elapsed=elapsed, modelName=modelName, report=True)
 
-fig = plot_conf_matrix(y_test, predictions, modelName=modelName)
-fig = plot_conf_matrix(y_train, predTrain, modelName=modelName+'_train')
+    fig = plot_conf_matrix(y_test, predictions, modelName=modelName)
 
-save_excel(metricsTest, metricsTrain)
+    save_excel(metricsTest, metricsCV)
+
+
+    'Decision Tree'
+    modelName = "Decision Tree"
+    print("\n"+modelName)
+
+    start = time.perf_counter()
+    predictions, predTrain, _ = decision_tree(trainDf, y_train, testDf, y_test)
+    elapsed = time.perf_counter() - start
+
+    metricsTest, _ = report_performance(y_test, predictions, elapsed=elapsed, modelName=modelName, report=True)
+
+    fig = plot_conf_matrix(y_test, predictions, modelName=modelName)
+
+    save_excel(metricsTest, metricsCV)
+
+
+    'Random Forest'
+    modelName = "Random Forest"
+    print("\n"+modelName)
+
+    start = time.perf_counter()
+    predictions, predTrain, _ = random_forest(trainDf, y_train, testDf, y_test)
+    elapsed = time.perf_counter() - start
+
+    metricsTest, _ = report_performance(y_test, predictions, elapsed=elapsed, modelName=modelName, report=True)
+
+    fig = plot_conf_matrix(y_test, predictions, modelName=modelName)
+
+    save_excel(metricsTest, metricsCV)
+
+
+    'AdaBoost'
+    modelName = "AdaBoost"
+    print("\n"+modelName)
+
+    start = time.perf_counter()
+    predictions, predTrain, _ = ada_boost(trainDf, y_train, testDf, y_test)
+    elapsed = time.perf_counter() - start
+
+    metricsTest, confMatrix = report_performance(y_test, predictions, elapsed=elapsed, modelName=modelName, report=True)
+
+    fig = plot_conf_matrix(y_test, predictions, modelName=modelName)
+
+    save_excel(metricsTest, metricsCV)

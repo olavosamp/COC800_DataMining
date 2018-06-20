@@ -2,7 +2,7 @@ import numpy 				 as np
 import matplotlib.pyplot 	 as plt
 from scipy 					 import interp
 
-from sklearn.model_selection import KFold
+from sklearn.model_selection import KFold, StratifiedKFold
 from sklearn.metrics 		 import (f1_score,
 									accuracy_score,
 									roc_auc_score,
@@ -11,11 +11,11 @@ from sklearn.metrics 		 import (f1_score,
 									classification_report,
 									roc_curve,
 									auc)
-import keras.callbacks 		 as callbacks
+
 
 fig, ax = plt.subplots(1, figsize=(15,10))
 
-def cross_val_analysis(n_split=10, classifier=None, x=None, y=None, model_name="", plot=True):
+def cross_val_analysis(n_split=10, classifier=None, x=None, y=None, model_name="", plot=False):
 	'''
 		Classification and ROC analysis
 		Run classifier with cross-validation and plot ROC curves
@@ -23,7 +23,7 @@ def cross_val_analysis(n_split=10, classifier=None, x=None, y=None, model_name="
 		Returns:
 			metrics_: Dict of metrics
 	'''
-	kf = KFold(n_splits=n_split)
+	kf = StratifiedKFold(n_splits=n_split)
 	kf.get_n_splits(x)
 
 	tprs = []
@@ -42,13 +42,9 @@ def cross_val_analysis(n_split=10, classifier=None, x=None, y=None, model_name="
 	i = 0
 	#start_time = time.time()
 	for train, val in kf.split(x,y):
-		#print('Train Process for %i Fold'%(i+1))
-		#print("TRAIN:", train_index, "TEST:", test_index)
-		#trainX, valX = trainDf[train_index], trainDf[val_index]
-		#trainY, valY = y_train[train_index], y_train[val_index]
-		model   = classifier.fit(x.iloc[train], y[train])
-		pred_   = model.predict(x.iloc[val])
-		probas_ = model.predict_proba(x.iloc[val])
+		model   = classifier.fit(x.iloc[train, :], y[train])
+		pred_   = model.predict(x.iloc[val, :])
+		probas_ = model.predict_proba(x.iloc[val, :])
 
 		# Metrics evaluation
 		accuracy_.append(100*accuracy_score(y[val],pred_ , normalize=True))
@@ -76,15 +72,15 @@ def cross_val_analysis(n_split=10, classifier=None, x=None, y=None, model_name="
 			 	 label='Luck', alpha=.8)
 
 	# Store average and std metrics in dict
-	metrics_['model']			= model_name
+	# metrics_['model']			= model_name
 	metrics_['accuracy']		= np.mean(accuracy_)
 	metrics_['accuracy_std']	= np.std(accuracy_)
 	metrics_['precision']		= np.mean(precision_)
 	metrics_['precision_std']	= np.std(precision_)
 	metrics_['recall']			= np.mean(recall_)
 	metrics_['recall_std']		= np.std(recall_)
-	metrics_['roc_auc']			= np.mean(roc_auc_)
-	metrics_['roc_auc_std']		= np.std(roc_auc_)
+	metrics_['auc']				= np.mean(roc_auc_)
+	metrics_['auc_std']			= np.std(roc_auc_)
 	metrics_['f1']				= np.mean(f1_score_)
 	metrics_['f1_std']			= np.std(f1_score_)
 	#metrics_['fpr']			= np.mean(fpr_)
@@ -123,6 +119,8 @@ def cross_val_analysis_nn(n_split=10, classifier=None, x=None, y=None, model_nam
 		Classification and ROC analysis
 		Run classifier with cross-validation and plot ROC curves
 	'''
+	import keras.callbacks 		 as callbacks
+
 	kf = KFold(n_splits=n_split)
 	kf.get_n_splits(x)
 

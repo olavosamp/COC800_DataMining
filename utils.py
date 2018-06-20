@@ -107,7 +107,7 @@ def report_performance(labels, predictions, elapsed=0, modelName="", report=True
     return metrics, conf_matrix
 
 
-def save_excel(metricsTest, metricsTrain):
+def save_excel(metricsTest, metricsCV):
     import os
 
     try:
@@ -116,15 +116,22 @@ def save_excel(metricsTest, metricsTrain):
         pass
 
     modelName = metricsTest["Model"][0].replace(" ", "_")#.split("_")[:-1]
+    metricsTest.pop("Model")
+    metricsTest.pop("Elapsed")
 
-    # Create DataFrame with train and test metrics
-    df = pd.DataFrame( [[metricsTrain['f1'][0], metricsTest['f1'][0] ],
-                        [metricsTrain['auc'][0], metricsTest['auc'][0] ],
-                        [metricsTrain['precision'][0], metricsTest['precision'][0] ],
-                        [metricsTrain['recall'][0], metricsTest['recall'][0] ],
-                        [metricsTrain['accuracy'][0], metricsTest['accuracy'][0] ]],
-                        columns=['Treino', 'Teste'], index=['F1', 'AUC', 'Precisão', 'Recall', 'Acc'])
+    df = pd.DataFrame()
 
+    for key in metricsCV.keys():
+        # Logic to print mean +- std in one field
+        if len(key.split("_")) >= 2:
+            name  = "_".join(key.split("_")[:-1])
+            compl = key.split("_")[-1]
+            if compl == "std":
+                df.loc[name, "CV"] = "{:.2f} ± {:.2f}".format(metricsCV[name], metricsCV[key])
+
+    for key in metricsTest.keys():
+        # Save floats in a scale [0, 100] for better visualization
+        df.loc[key, "Teste"] = metricsTest[key][0]*100
 
     # Save metrics to Excel file
     filePath = dirs.report+"metrics_"+modelName+".xlsx"

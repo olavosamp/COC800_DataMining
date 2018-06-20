@@ -8,8 +8,8 @@ def load_dataset(path, fracPos=1.0, fracNeg=1.0, numPos=0, numNeg=0, randomState
     data = np.load(path)
 
     # Save each class
-    classPos = pd.DataFrame(data[data.keys()[0]])
-    classNeg = pd.DataFrame(data[data.keys()[1]])
+    classNeg = pd.DataFrame(data[data.keys()[0]])   # Hadrons
+    classPos = pd.DataFrame(data[data.keys()[1]])   # Eletrons
 
     print("\nOriginal data:")
     print("Positive examples: {:>9d}".format(classPos.shape[0]))
