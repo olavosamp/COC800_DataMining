@@ -95,6 +95,8 @@ def decision_tree(x_train, y_train, x_test, y_test, compute_threshold=True):
         bestThresh = get_best_thresh(y_train, probTrain)
 
         predTest    = np.where(probTest[:, 1] >= bestThresh, defs.posCode, defs.negCode)
+
+        plot_roc_curve(y_test, probTest, modelName="Decision Tree")
     else:
         predTest    = model.predict(x_test)
 
@@ -125,6 +127,8 @@ def random_forest(x_train, y_train, x_test, y_test, compute_threshold=True):
         bestThresh = get_best_thresh(y_train, probTrain)
 
         predTest    = np.where(probTest[:, 1] >= bestThresh, defs.posCode, defs.negCode)
+
+        plot_roc_curve(y_test, probTest, modelName="Random Forest")
     else:
         predTest    = model.predict(x_test)
 
@@ -189,6 +193,8 @@ def linear_discriminant_analysis(x_train, y_train, x_test, y_test, n_components=
         bestThresh = get_best_thresh(y_train, probTrain)
 
         predTest    = np.where(probTest[:, 1] >= bestThresh, defs.posCode, defs.negCode)
+
+        plot_roc_curve(y_test, probTest, modelName="Linear Discriminant Analysis")
     else:
         predTest    = model.predict(x_test)
 
@@ -219,6 +225,8 @@ def quadratic_discriminant_analysis(x_train, y_train, x_test, y_test, compute_th
         bestThresh = get_best_thresh(y_train, probTrain)
 
         predTest    = np.where(probTest[:, 1] >= bestThresh, defs.posCode, defs.negCode)
+
+        plot_roc_curve(y_test, probTest, modelName="Quadratic Discriminant Analysis")
     else:
         predTest    = model.predict(x_test)
 
@@ -253,6 +261,8 @@ def nearest_neighbours(x_train, y_train, x_test, y_test, compute_threshold=True)
         bestThresh = get_best_thresh(y_train, probTrain)
 
         predTest    = np.where(probTest[:, 1] >= bestThresh, defs.posCode, defs.negCode)
+
+        plot_roc_curve(y_test, probTest, modelName="Nearest Neighbors")
     else:
         predTest    = model.predict(x_test)
 
@@ -282,3 +292,65 @@ def perceptron(x_train, y_train, x_test, y_test):
     predTest = model.predict(x_test)
 
     return predTest, metricsCV, model
+
+def svm(x_train, y_train, x_test, y_test, compute_threshold=True):
+    '''
+        Train SVM classifier on x_train and predict on x_test.
+
+        x_train, x_test: DataFrames of shape data x features.
+    '''
+    from sklearn.svm           import SVC
+
+    model = SVC(C=1.0, cache_size=200, class_weight=None, coef0=0.0,decision_function_shape='ovr', degree=3, gamma='auto', kernel='rbf',
+                max_iter=-1, probability=True, random_state=None, shrinking=True,tol=0.001, verbose=False)
+
+    model.fit(x_train, y_train)
+
+    if compute_threshold is True:
+        probTest  = model.predict_proba(x_test)
+        probTrain = model.predict_proba(x_train)
+
+        bestThresh = get_best_thresh(y_train, probTrain)
+
+        predTest = np.where(probTest[:, 1] >= bestThresh, defs.posCode, defs.negCode)
+
+        plot_roc_curve(y_test, probTest, modelName="SVM")
+    else:
+        predTest    = model.predict(x_test)
+
+    return predTest, metricsCV, model
+
+def linear_svm(x_train, y_train, x_test, y_test, compute_threshold=True):
+    '''
+        Train linear SVM classifier on x_train and predict on x_test.
+
+        x_train, x_test: DataFrames of shape data x features.
+    '''
+    from sklearn.neighbors     import KNeighborsClassifier
+    from sklearn.svm import SVC
+    # TODO: Experiment with 'weights' parameter
+    # classWeights = {defs.posCode: 0.5, defs.negCode: 0.5}
+    svm = LinearSVC(C=1.0, class_weight=None, dual=True, fit_intercept=True,
+                    intercept_scaling=1, loss='squared_hinge', max_iter=1000,
+                    multi_class='ovr', penalty='l2', random_state=0, tol=0.0001,
+                    verbose=0)
+
+    # print("\nParameters initialization:")
+    # print(percep.coef_)
+
+    svm.fit(x_train, y_train)#, weights) # TODO: Add class weights
+
+
+    if compute_threshold is True:
+        probTest  = svm.predict_proba(x_test)
+        probTrain = svm.predict_proba(x_train)
+
+        bestThresh = get_best_thresh(y_train, probTrain)
+
+        predTest    = np.where(probTest[:, 1] >= bestThresh, defs.posCode, defs.negCode)
+        predTrain   = np.where(probTrain[:, 1] >= bestThresh, defs.posCode, defs.negCode)
+    else:
+        predTest    = svm.predict(x_test)
+        predTrain   = svm.predict(x_train)
+
+    return predTest, predTrain, svm

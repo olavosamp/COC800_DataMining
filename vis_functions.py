@@ -74,7 +74,7 @@ def plot_conf_matrix(labels, predictions, modelName="", show=False, save=True, n
 
     fig, axs = plt.subplots(nrows=1, ncols=2, figsize=(15,10))
     confDf = pd.DataFrame(confusion_matrix(labels, predictions, labels=[defs.posCode, defs.negCode]),
-                         index=['True H', 'True E'], columns=['Pred. H', 'Pred. E'])
+                         index=['True E', 'True H'], columns=['Pred. E', 'Pred. H'])
 
     ## Plot confusion matrix
     # Auto adjust colorbar limits

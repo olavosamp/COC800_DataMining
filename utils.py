@@ -6,6 +6,61 @@ import dirs
 
 np.set_printoptions(precision=2)
 
+def save_latex(modelName):
+    '''
+        Writes metrics tables as latex code.
+        This is a great function.
+    '''
+    import os
+
+    try:
+        os.makedirs(dirs.report)
+    except OSError:
+        pass
+
+    modelName = modelName.replace(" ", "_")
+
+    filePath = dirs.report+"latex_"+modelName+".tex"
+    dataPath = dirs.report+"metrics_"+modelName+".xlsx"
+    metricsDf = pd.read_excel(dataPath)
+
+    f1CV   = metricsDf.iloc[4, 0]
+    aucCV  = metricsDf.iloc[3, 0]
+    precCV = metricsDf.iloc[1, 0]
+    recCV  = metricsDf.iloc[2, 0]
+
+    f1Test   = metricsDf.iloc[4, 1]
+    aucTest  = metricsDf.iloc[3, 1]
+    precTest = metricsDf.iloc[1, 1]
+    recTest  = metricsDf.iloc[2, 1]
+
+    latexString = """\\begin{{figure}}[htbp]
+\\centering
+\\includegraphics[scale=0.2]{{Conf_matrix_{}}}
+\\caption{{Matrizes de confusao do {}.}}
+\\label{{fig_{}_matConf}}
+\\end{{figure}}
+
+\\begin{{table}}[htb]
+\\centering
+\\caption{{Resultados do {}.}}
+\\label{{tab_{}Results}}
+  \\begin{{tabular}}{{l|l|l}}
+   & \\textbf{{CV}} & \\textbf{{Teste}} \\\\ \\hline
+  F1 & {} & {:.2f} \\\\
+  AUC & {} & {:.2f} \\\\
+  Precisao & {} & {:.2f} \\\\
+  Recall & {} & {:.2f}
+  \\end{{tabular}}
+\\end{{table}}""".format(modelName, modelName, modelName, modelName.replace("_", " "),
+                         modelName, f1CV, f1Test, aucCV, aucTest, precCV, precTest, recCV, recTest)
+
+    file = open(filePath, 'w')
+    file.write(latexString)
+    file.close()
+
+    return defs.success
+
 def sp_score(labels, predictions):
     from sklearn.metrics    import confusion_matrix
 
@@ -108,6 +163,9 @@ def report_performance(labels, predictions, elapsed=0, modelName="", report=True
 
 
 def save_excel(metricsTest, metricsCV):
+    '''
+        Saves two metrics dictionary to a single table in an Excel file
+    '''
     import os
 
     try:
@@ -141,6 +199,10 @@ def save_excel(metricsTest, metricsCV):
 
 
 def save_results(cvResults, predictions, modelName):
+    '''
+        Saves hyperparameter search results a csv file and best parameter
+        predictions to a npy file
+    '''
     import os
     import dirs
 
