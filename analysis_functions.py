@@ -270,8 +270,7 @@ def nearest_neighbours(x_train, y_train, x_test, y_test, compute_threshold=True)
 
 def perceptron(x_train, y_train, x_test, y_test):
     '''
-        Train a Perceptron classifier with linear activation function on x_train
-        and predict on x_test.
+        Train a Rosenblatt Perceptron classifier on x_train and predict on x_test.
 
         x_train, x_test: DataFrames of shape data x features.
     '''
@@ -279,9 +278,6 @@ def perceptron(x_train, y_train, x_test, y_test):
 
     classWeights = {defs.posCode: 0.5, defs.negCode: 0.5}
     model = Perceptron(shuffle=True, n_jobs=-1, class_weight=classWeights, max_iter=1000, tol=1e-3)
-
-    # print("\nParameters initialization:")
-    # print(model.coef_)
 
     # metricsCV = cross_val_analysis(classifier=model, x=x_train, y=y_train, plot=False)
     metricsCV = dict()
@@ -303,6 +299,8 @@ def svm(x_train, y_train, x_test, y_test, compute_threshold=True):
 
     model = SVC(C=1.0, cache_size=200, class_weight=None, coef0=0.0,decision_function_shape='ovr', degree=3, gamma='auto', kernel='rbf',
                 max_iter=-1, probability=True, random_state=None, shrinking=True,tol=0.001, verbose=False)
+
+    metricsCV = cross_val_analysis(classifier=model, x=x_train, y=y_train, plot=False)
 
     model.fit(x_train, y_train)
 
@@ -326,31 +324,66 @@ def linear_svm(x_train, y_train, x_test, y_test, compute_threshold=True):
 
         x_train, x_test: DataFrames of shape data x features.
     '''
-    from sklearn.neighbors     import KNeighborsClassifier
-    from sklearn.svm import SVC
-    # TODO: Experiment with 'weights' parameter
-    # classWeights = {defs.posCode: 0.5, defs.negCode: 0.5}
-    svm = LinearSVC(C=1.0, class_weight=None, dual=True, fit_intercept=True,
+    from sklearn.svm import LinearSVC
+
+    model = LinearSVC(C=1.0, class_weight=None, dual=True, fit_intercept=True,
                     intercept_scaling=1, loss='squared_hinge', max_iter=1000,
                     multi_class='ovr', penalty='l2', random_state=0, tol=0.0001,
                     verbose=0)
 
-    # print("\nParameters initialization:")
-    # print(percep.coef_)
+    metricsCV = cross_val_analysis(classifier=model, x=x_train, y=y_train, plot=False)
 
-    svm.fit(x_train, y_train)#, weights) # TODO: Add class weights
-
+    model.fit(x_train, y_train)
 
     if compute_threshold is True:
-        probTest  = svm.predict_proba(x_test)
-        probTrain = svm.predict_proba(x_train)
+        probTest  = model.predict_proba(x_test)
+        probTrain = model.predict_proba(x_train)
 
         bestThresh = get_best_thresh(y_train, probTrain)
 
-        predTest    = np.where(probTest[:, 1] >= bestThresh, defs.posCode, defs.negCode)
-        predTrain   = np.where(probTrain[:, 1] >= bestThresh, defs.posCode, defs.negCode)
-    else:
-        predTest    = svm.predict(x_test)
-        predTrain   = svm.predict(x_train)
+        predTest = np.where(probTest[:, 1] >= bestThresh, defs.posCode, defs.negCode)
 
-    return predTest, predTrain, svm
+        plot_roc_curve(y_test, probTest, modelName="SVM")
+    else:
+        predTest    = model.predict(x_test)
+
+    return predTest, metricsCV, model
+
+def mlp(x_train, y_train, x_test, y_test, hidden_neurons=10,
+         hidden_activation='tanh', output_activation='tanh', lossFunction='mean_squared_error',
+         optmizer='Adam', metrics=['mae','mape','acc','categorical_accuracy'],
+         patience=30, train_verbose=2, n_epochs=500):
+    '''
+        Neural Networks classifier.
+
+        x_train, x_test: DataFrames of shape data x features.
+    '''
+    from keras.models         import Sequential
+    from keras.layers         import Dense
+    import keras.callbacks    as callbacks
+
+    model = Sequential()
+    model.add(Dense(hidden_neurons, input_dim=x_train.shape[1], activation=hidden_activation))
+    model.add(Dense(1, activation=output_activation))
+    model.compile(loss=lossFunction, optimizer=optmizer, metrics=metrics)
+
+    earlyStopping = callbacks.EarlyStopping(monitor='val_loss', patience=patience, verbose=train_verbose, mode='auto')
+    history = model.fit(x_train, y_train, epochs=n_epochs, callbacks=[earlyStopping], verbose=train_verbose, validation_data=(x_test, y_test))
+
+    metricsCV = cross_val_analysis(classifier=model, x=x_train, y=y_train, plot=False)
+
+    model.fit(x_train, y_train)
+
+    if compute_threshold is True:
+        probTest  = model.predict_proba(x_test)
+        probTrain = model.predict_proba(x_train)
+
+        bestThresh = get_best_thresh(y_train, probTrain)
+
+        predTest = np.where(probTest[:, 1] >= bestThresh, defs.posCode, defs.negCode)
+
+        plot_roc_curve(y_test, probTest, modelName="SVM")
+    else:
+        predTest    = model.predict(x_test)
+
+    return predTest, metricsCV, model

@@ -21,7 +21,7 @@ from analysis_functions             import (gaussian_naive_bayes,
                                             nearest_neighbours,
                                             decision_tree, random_forest, ada_boost,
                                             linear_discriminant_analysis, quadratic_discriminant_analysis,
-                                            svm)
+                                            svm, linear_svm, mlp)
 
 from vis_functions                  import plot_conf_matrix, plot_roc_curve
 
@@ -52,7 +52,7 @@ if __name__ == "__main__":
     # compactDf = dimension_reduction(dataDf, keepComp=60)
 
     print("\n\n---- Classification ----\n")
-
+    #
     # 'Naive Bayes'
     # modelName = "Naive Bayes"
     # print("\n"+modelName)
@@ -86,12 +86,12 @@ if __name__ == "__main__":
     # save_latex(modelName)
     #
     #
-    # 'Linear Perceptron'
+    # 'Perceptron'
     # modelName = "Perceptron"
     # print("\n"+modelName)
     #
     # start = time.perf_counter()
-    # predictions, predTrain, _ = perceptron(trainDf, y_train, testDf, y_test)
+    # predictions, _, _ = perceptron(trainDf, y_train, testDf, y_test)
     # elapsed = time.perf_counter() - start
     #
     # metricsTest, conf_matrix = report_performance(y_test, predictions, elapsed=elapsed, modelName=modelName, report=True)
@@ -108,7 +108,7 @@ if __name__ == "__main__":
     # print("\n"+modelName)
     #
     # start = time.perf_counter()
-    # predictions, predTrain, _ = nearest_neighbours(trainDf, y_train, testDf, y_test)
+    # predictions, metricsCV, _ = nearest_neighbours(trainDf, y_train, testDf, y_test)
     # elapsed = time.perf_counter() - start
     #
     # metricsTest, conf_matrix = report_performance(y_test, predictions, elapsed=elapsed, modelName=modelName, report=True)
@@ -124,7 +124,7 @@ if __name__ == "__main__":
     # print("\n"+modelName)
     #
     # start = time.perf_counter()
-    # predictions, predTrain, _ = linear_discriminant_analysis(trainDf, y_train, testDf, y_test, n_components=None)
+    # predictions, metricsCV, _ = linear_discriminant_analysis(trainDf, y_train, testDf, y_test, n_components=None)
     # elapsed = time.perf_counter() - start
     #
     # metricsTest, conf_matrix = report_performance(y_test, predictions, elapsed=elapsed, modelName=modelName, report=True)
@@ -140,7 +140,7 @@ if __name__ == "__main__":
     # print("\n"+modelName)
     #
     # start = time.perf_counter()
-    # predictions, predTrain, _ = linear_discriminant_analysis(trainDf, y_train, testDf, y_test)
+    # predictions, metricsCV, _ = linear_discriminant_analysis(trainDf, y_train, testDf, y_test)
     # elapsed = time.perf_counter() - start
     #
     # metricsTest, conf_matrix = report_performance(y_test, predictions, elapsed=elapsed, modelName=modelName, report=True)
@@ -156,7 +156,7 @@ if __name__ == "__main__":
     # print("\n"+modelName)
     #
     # start = time.perf_counter()
-    # predictions, predTrain, _ = decision_tree(trainDf, y_train, testDf, y_test)
+    # predictions, metricsCV, _ = decision_tree(trainDf, y_train, testDf, y_test)
     # elapsed = time.perf_counter() - start
     #
     # metricsTest, _ = report_performance(y_test, predictions, elapsed=elapsed, modelName=modelName, report=True)
@@ -172,7 +172,7 @@ if __name__ == "__main__":
     # print("\n"+modelName)
     #
     # start = time.perf_counter()
-    # predictions, predTrain, _ = random_forest(trainDf, y_train, testDf, y_test)
+    # predictions, metricsCV, _ = random_forest(trainDf, y_train, testDf, y_test)
     # elapsed = time.perf_counter() - start
     #
     # metricsTest, _ = report_performance(y_test, predictions, elapsed=elapsed, modelName=modelName, report=True)
@@ -188,7 +188,23 @@ if __name__ == "__main__":
     # print("\n"+modelName)
     #
     # start = time.perf_counter()
-    # predictions, predTrain, _ = ada_boost(trainDf, y_train, testDf, y_test)
+    # predictions, metricsCV, _ = ada_boost(trainDf, y_train, testDf, y_test)
+    # elapsed = time.perf_counter() - start
+    #
+    # metricsTest, confMatrix = report_performance(y_test, predictions, elapsed=elapsed, modelName=modelName, report=True)
+    #
+    # fig = plot_conf_matrix(y_test, predictions, modelName=modelName)
+    #
+    # save_excel(metricsTest, metricsCV)
+    # save_latex(modelName)
+    #
+    #
+    # 'SVM'
+    # modelName = "SVM"
+    # print("\n"+modelName)
+    #
+    # start = time.perf_counter()
+    # predictions, metricsCV, _ = svm(trainDf, y_train, testDf, y_test)
     # elapsed = time.perf_counter() - start
     #
     # metricsTest, confMatrix = report_performance(y_test, predictions, elapsed=elapsed, modelName=modelName, report=True)
@@ -198,13 +214,27 @@ if __name__ == "__main__":
     # save_excel(metricsTest, metricsCV)
     # save_latex(modelName)
 
+    # 'Linear SVM'
+    # modelName = "Linear SVM"
+    # print("\n"+modelName)
+    #
+    # start = time.perf_counter()
+    # predictions, metricsCV, _ = linear_svm(trainDf, y_train, testDf, y_test)
+    # elapsed = time.perf_counter() - start
+    #
+    # metricsTest, confMatrix = report_performance(y_test, predictions, elapsed=elapsed, modelName=modelName, report=True)
+    #
+    # fig = plot_conf_matrix(y_test, predictions, modelName=modelName)
+    #
+    # save_excel(metricsTest, metricsCV)
+    # save_latex(modelName)
 
-    'SVM'
-    modelName = "SVM"
+    'MLP'
+    modelName = "MLP"
     print("\n"+modelName)
 
     start = time.perf_counter()
-    predictions, predTrain, _ = svm(trainDf, y_train, testDf, y_test)
+    predictions, metricsCV, _ = mlp(trainDf, y_train, testDf, y_test)
     elapsed = time.perf_counter() - start
 
     metricsTest, confMatrix = report_performance(y_test, predictions, elapsed=elapsed, modelName=modelName, report=True)
